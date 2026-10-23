@@ -427,8 +427,7 @@ const Supa = (() => {
       xhr.open('POST', `${CONFIG.url}/storage/v1/object/${bucket}/${path}`);
       xhr.setRequestHeader('apikey', CONFIG.anonKey);
       if (session?.access_token) xhr.setRequestHeader('Authorization', 'Bearer ' + session.access_token);
-      xhr.setRequestHeader('x-upsert', 'true');
-      xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
+            xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
       xhr.upload.onprogress = (e) => { if (e.lengthComputable && onProgress) onProgress(Math.round(e.loaded / e.total * 100)); };
       xhr.onload = () => {
         if (xhr.status >= 200 && xhr.status < 300) resolve(JSON.parse(xhr.responseText || '{}'));
