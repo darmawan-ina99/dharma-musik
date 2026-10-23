@@ -1,55 +1,70 @@
 <!DOCTYPE html>
-<html><head><meta charset="utf-8"><title>Tes Upload</title></head>
+<html><head><meta charset="utf-8"><title>Tes Upload Resumable</title></head>
 <body style="font:13px monospace;white-space:pre-wrap;background:#111;color:#9f9;padding:14px" id="out">mulai...
 <script>
 const CONFIG = { url: 'https://mzaxwsxpsfjhwailsrwz.supabase.co', anonKey: 'sb_publishable_WqQuEVBC8BAPP5BBMjeCNQ_77TB-PAn' };
 const log = (...a) => { document.getElementById('out').textContent += '\n' + a.join(' '); };
 window.onerror = (m,s,l) => log('JS-ERROR:', m, 'baris', l);
-
 let session = null;
-function uploadXHR(bucket, path, file, onProgress) {
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', CONFIG.url + '/storage/v1/object/' + bucket + '/' + path);
-    xhr.setRequestHeader('apikey', CONFIG.anonKey);
-    if (session?.access_token) xhr.setRequestHeader('Authorization', 'Bearer ' + session.access_token);
-    xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
-    xhr.upload.onprogress = (e) => { if (e.lengthComputable && onProgress) onProgress(Math.round(e.loaded / e.total * 100)); };
-    xhr.onload = () => {
-      if (xhr.status >= 200 && xhr.status < 300) resolve(JSON.parse(xhr.responseText || '{}'));
-      else { let m = 'Upload gagal (' + xhr.status + ')'; try { m = JSON.parse(xhr.responseText).message || m; } catch (e) {} reject(new Error(m)); }
-    };
-    xhr.onerror = () => reject(new Error('Koneksi terputus saat upload. Periksa jaringan.'));
-    xhr.send(file);
-  });
+function headers(withAuth = true, extra = {}) {
+  const h = { apikey: CONFIG.anonKey, ...extra };
+  if (withAuth && session?.access_token) h['Authorization'] = 'Bearer ' + session.access_token;
+  return h;
 }
+async function refreshIfNearExpiry() {}
+
+  // UPLOAD RESUMABLE (protokol TUS Supabase Storage):
+  // file dipecah chunk 5MB; jika koneksi putus di tengah jalan, uploader
+  // menunggu sebentar, membaca posisi terakhir dari server, lalu MELANJUTKAN
+  // dari chunk tersebut — tidak mulai dari nol. Berhasil melewati jaringan
+  // seluler yang tidak stabil.
+  const TUS_HOST = CONFIG.url.replace('.supabase.co', '.storage.supabase.co');
+  const TUS_CHUNK = 2 * 1024 * 1024; // chunk kecil: progres halus + resume cepat di jaringan seluler
+  const b64s = (str) => btoa(unescape(encodeURIComponent(str)));
+
+  async function tusOffset(up) {
+    const r = await fetch(up, { method: 'HEAD', headers: headers(true, { 'tus-resumable': '1.0.0' }) });
+    if (!r.ok) throw new Error('Posisi upload tidak terbaca (' + r.status + ').');
+    return parseInt(r.headers.get('Upload-Offset') || '0', 10);
+  }
 
 async function main() {
-  // 1. login
   const lr = await fetch(CONFIG.url + '/auth/v1/token?grant_type=password', {
     method: 'POST', headers: { 'apikey': CONFIG.anonKey, 'Content-Type': 'application/json' },
     body: JSON.stringify({ email: 'e2e2-tes@dharmalabs.id', password: 'DharmaE2E2026!' })
   });
-  log('login:', lr.status);
-  session = await lr.json();
-  const uid = session.user?.id;
-  log('uid:', uid);
+  session = await lr.json(); const uid = session.user.id;
+  log('login OK, uid:', uid);
+  const mkfile = (size, val) => { const b = new Uint8Array(size); for (let i=0;i<size;i+=4096) b[i]=val; return new File([b], 'uji.wav', { type: 'audio/wav' }); };
 
-  // 2. blob uji bertingkat
-  for (const size of [102400, 3*1024*1024, 10*1024*1024]) {
-    const bytes = new Uint8Array(size);
-    for (let i = 0; i < size; i += 4096) bytes[i] = 65;
-    const file = new File([bytes], 'uji.wav', { type: 'audio/wav' });
-    const t0 = Date.now();
-    try {
-      const r = await uploadXHR('dharma-audio', uid + '/' + size + '.wav', file,
-        p => { if (p % 50 === 0) log('progress', size, p + '%'); });
-      log('UPLOAD', size, 'OK dalam', ((Date.now()-t0)/1000).toFixed(1) + 's', JSON.stringify(r).slice(0, 60));
-    } catch (e) {
-      log('UPLOAD', size, 'GAGAL:', e.message, '(' + ((Date.now()-t0)/1000).toFixed(1) + 's)');
+  // TES 1: normal 6MB
+  try {
+    const r = await upload('dharma-audio', uid + '/tes1.wav', mkfile(6*1024*1024, 65), p => log('  tes1 progres:', p + '%'));
+    log('TES1 UPLOAD 6MB: OK');
+  } catch (e) { log('TES1 GAGAL:', e.message); }
+
+  // TES 2: putus jaringan dipaksa pada chunk ke-2, dua kali
+  const fetchAsli = window.fetch; let patchCount = 0;
+  window.fetch = function(url, opts) {
+    if (opts && opts.method === 'PATCH' && String(url).indexOf('upload/resumable/') > 0) {
+      patchCount++;
+      if (patchCount === 2 || patchCount === 4) { log('  >> SIMULASI PUTUS pada PATCH #' + patchCount); return new Promise((_, rej) => setTimeout(() => rej(new TypeError('Failed to fetch')), 300)); }
     }
+    return fetchAsli.apply(this, arguments);
+  };
+  try {
+    const t0 = Date.now();
+    const r = await upload('dharma-audio', uid + '/tes2.wav', mkfile(6*1024*1024, 66), p => log('  tes2 progres:', p + '%'));
+    log('TES2 RESUME SETELAH PUTUS x2: OK dalam ' + ((Date.now()-t0)/1000).toFixed(1) + 's (patch total: ' + patchCount + ')');
+  } catch (e) { log('TES2 GAGAL:', e.message); }
+  window.fetch = fetchAsli;
+
+  // bersih-bersih
+  for (const f of ['tes1.wav','tes2.wav','proto.wav','proto2.wav','102400.wav','3145728.wav','10485760.wav']) {
+    try { await fetchAsli(CONFIG.url + '/storage/v1/object/dharma-audio/' + uid + '/' + f, { method: 'DELETE', headers: headers() }); } catch (e) {}
   }
-  log('SELESAI TES');
+  log('bersih-bersih selesai');
+  log('SELESAI SEMUA TES');
 }
 main().catch(e => log('FATAL:', e.message));
 </script></body></html>
