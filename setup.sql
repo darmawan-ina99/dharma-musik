@@ -104,12 +104,12 @@ create policy dharma_pt_owner_all on public.dharma_playlist_tracks
 -- dharma-site   : PUBLIK  (hosting file situs)
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values ('dharma-audio', 'dharma-audio', false, 52428800,
-        'audio/mpeg','audio/mp3','audio/wav','audio/x-wav','audio/wave','audio/ogg','audio/webm','audio/flac','audio/x-flac','audio/aac','audio/mp4','audio/x-m4a','audio/m4a')
+        array['audio/mpeg','audio/mp3','audio/wav','audio/x-wav','audio/wave','audio/ogg','audio/webm','audio/flac','audio/x-flac','audio/aac','audio/mp4','audio/x-m4a','audio/m4a']::text[])
 on conflict (id) do nothing;
 
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values ('dharma-covers', 'dharma-covers', true, 10485760,
-        'image/jpeg','image/png','image/webp')
+        array['image/jpeg','image/png','image/webp']::text[])
 on conflict (id) do nothing;
 
 insert into storage.buckets (id, name, public)
