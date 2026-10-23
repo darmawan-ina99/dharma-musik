@@ -1240,6 +1240,7 @@ const App = (() => {
     if (Supa.getSession()) {
       document.getElementById('navbar').classList.remove('hidden');
       setActiveNav('/' + r.page.split('/')[1]);
+      if (r.page === '/login') { location.hash = '#/'; return; } // sudah masuk: langsung ke beranda
     } else {
       document.getElementById('navbar').classList.add('hidden');
       if (r.page !== '/login') { location.hash = '#/login'; return; }
