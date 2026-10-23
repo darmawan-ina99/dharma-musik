@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0f0f14">
+<title>Dharma Musik Digital</title>
+<link rel="icon" href="https://base44.app/api/apps/6ad6d8e4d50f54b774f395ec/files/mp/public/6ad6d8e4d50f54b774f395ec/a4ba4a47f_dharmalabs_logo_resmi.jpg">
+<style>
+/* ============================================================
+   Dharma Musik Digital — identitas Dharma Labs Digital
+   Palet: hitam arang, ungu gelap, magenta, cyan. Dark-first.
+   ============================================================ */
+:root{
+  --bg:#0f0f14; --bg2:#15151d; --panel:#1a1a24; --panel2:#22222e;
+  --purple:#2a1b3d; --magenta:#e0409a; --cyan:#22d3ee;
+  --text:#f2f2f7; --muted:#9a9aa8; --border:rgba(255,255,255,.09);
+  --grad:linear-gradient(120deg,var(--magenta),var(--cyan));
+  --radius:16px; --shadow:0 8px 30px rgba(0,0,0,.45);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif;line-height:1.55;min-height:100vh}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(60% 40% at 80% -10%,rgba(42,27,61,.55),transparent 70%),
+             radial-gradient(50% 30% at 0% 110%,rgba(224,64,154,.10),transparent 60%)}
+#app{position:relative;z-index:1}
+.hidden{display:none!important}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+input,select,textarea{font:inherit;color:var(--text);background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;width:100%}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--cyan);outline-offset:-1px}
+::placeholder{color:var(--muted)}
+img{display:block}
+
+/* ---------- NAVBAR ---------- */
+#navbar{position:sticky;top:0;z-index:50;background:rgba(15,15,20,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:18px;padding:10px 18px}
+.brand{display:flex;align-items:center;gap:10px;flex:0 0 auto}
+.brand img{width:40px;height:40px;border-radius:10px;object-fit:cover;background:#fff}
+.brand-text{line-height:1.15;font-size:.95rem}
+.brand-text strong{display:block;font-size:1.02rem}
+.brand-text span{color:var(--cyan);font-size:.72rem;letter-spacing:2.5px}
+#mainNav{display:flex;gap:6px;margin-left:12px;flex:1}
+#mainNav a,#mobileNav a{padding:8px 12px;border-radius:10px;color:var(--muted);font-weight:500;white-space:nowrap}
+#mainNav a:hover,#mobileNav a:hover{color:var(--text);background:var(--panel2)}
+#mainNav a.active,#mobileNav a.active{color:#fff;background:linear-gradient(120deg,rgba(224,64,154,.25),rgba(34,211,238,.2));box-shadow:0 0 12px rgba(34,211,238,.15) inset}
+.nav-actions{display:flex;gap:8px;align-items:center}
+#hamburgerBtn{display:none}
+#mobileNav{padding:8px 12px 14px;border-top:1px solid var(--border)}
+#mobileNav a{display:block;padding:12px 10px;border-bottom:1px solid var(--border)}
+
+/* ---------- TOMBOL ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 20px;border-radius:12px;font-weight:600;border:1px solid transparent;transition:filter .15s,transform .05s;min-height:44px}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--grad);color:#fff;box-shadow:0 4px 18px rgba(224,64,154,.35)}
+.btn-primary:hover{filter:brightness(1.1)}
+.btn-ghost{border-color:var(--border);background:var(--panel)}
+.btn-ghost:hover{background:var(--panel2)}
+.btn-danger{background:#c0392b;color:#fff}
+.btn-sm{padding:8px 14px;min-height:38px;font-size:.9rem}
+.icon-btn{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:12px;background:var(--panel);border:1px solid var(--border);font-size:1.05rem;transition:background .15s}
+.icon-btn:hover{background:var(--panel2)}
+.icon-btn.active{border-color:var(--cyan);color:var(--cyan);box-shadow:0 0 12px rgba(34,211,238,.3)}
+
+/* ---------- HALAMAN ---------- */
+#page{max-width:1200px;margin:0 auto;padding:24px 18px 120px}
+.page-title{font-size:1.6rem;font-weight:700;margin-bottom:6px}
+.page-sub{color:var(--muted);margin-bottom:20px}
+.section{margin-top:34px}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px;flex-wrap:wrap}
+.section-head h2{font-size:1.25rem}
+
+/* ---------- HERO ---------- */
+.hero{display:grid;grid-template-columns:1.15fr .85fr;gap:28px;align-items:center;background:linear-gradient(135deg,var(--purple),#141020 60%);border:1px solid var(--border);border-radius:24px;padding:38px 34px;margin-top:8px;overflow:hidden;position:relative}
+.hero::after{content:"";position:absolute;right:-80px;top:-80px;width:320px;height:320px;border-radius:50%;background:var(--grad);filter:blur(120px);opacity:.25}
+.hero h1{font-size:clamp(1.7rem,4vw,2.6rem);line-height:1.2;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:12px}
+.hero p{color:#cfcfda;margin-bottom:22px;max-width:46ch}
+.hero-art{width:100%;border-radius:16px;box-shadow:var(--shadow)}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap;position:relative;z-index:1}
+
+/* ---------- RINGKASAN ---------- */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:26px}
+.stat{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:18px}
+.stat .num{font-size:1.7rem;font-weight:800;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat .lbl{color:var(--muted);font-size:.86rem;margin-top:2px}
+
+/* ---------- TOOLBAR PENCARIAN ---------- */
+.toolbar{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:10px;margin-bottom:18px}
+.toolbar input,.toolbar select{min-width:0}
+
+/* ---------- GRID LAGU ---------- */
+.song-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.song-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:transform .12s,border-color .12s;display:flex;flex-direction:column}
+.song-card:hover{transform:translateY(-3px);border-color:rgba(34,211,238,.4)}
+.song-cover{position:relative;aspect-ratio:1/1;background:linear-gradient(135deg,var(--purple),var(--bg2));cursor:pointer}
+.song-cover img{width:100%;height:100%;object-fit:cover}
+.song-cover .play-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(10,8,16,.45);opacity:0;transition:opacity .15s;font-size:2.4rem}
+.song-cover:hover .play-overlay{opacity:1}
+.song-cover .playing-badge{position:absolute;top:8px;left:8px;background:var(--grad);color:#fff;font-size:.68rem;font-weight:700;padding:4px 8px;border-radius:8px;display:none}
+.song-card.playing .playing-badge{display:block}
+.song-body{padding:12px 14px;flex:1;display:flex;flex-direction:column;gap:3px}
+.song-title{font-weight:700;font-size:.98rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.song-artist{color:var(--cyan);font-size:.86rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.song-meta{color:var(--muted);font-size:.78rem}
+.song-actions{display:flex;gap:6px;padding:10px 14px 14px;border-top:1px solid var(--border)}
+.song-actions .icon-btn{width:36px;height:36px;font-size:.92rem;border-radius:10px}
+.song-actions .spacer{flex:1}
+
+/* ---------- DAFTAR TABEL ---------- */
+.song-list{display:flex;flex-direction:column;gap:8px}
+.song-row{display:grid;grid-template-columns:44px 1fr 110px auto;gap:12px;align-items:center;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:10px 14px}
+.song-row img{width:44px;height:44px;border-radius:8px;object-fit:cover;background:var(--purple)}
+.song-row .meta{min-width:0}
+.song-row .meta .t{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.song-row .meta .a{color:var(--muted);font-size:.82rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.song-row .dur{color:var(--muted);font-size:.85rem;text-align:right}
+.song-row .racts{display:flex;gap:6px}
+.song-row .racts .icon-btn{width:34px;height:34px;font-size:.85rem}
+
+/* ---------- PLAYLIST ---------- */
+.playlist-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.playlist-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:18px;cursor:pointer;transition:transform .12s,border-color .12s;position:relative}
+.playlist-card:hover{transform:translateY(-3px);border-color:rgba(224,64,154,.45)}
+.playlist-card .count{color:var(--muted);font-size:.84rem;margin-top:6px}
+.playlist-card .icon{font-size:2rem;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.playlist-card h3{margin-top:8px}
+
+/* ---------- FORM ---------- */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-grid .full{grid-column:1/-1}
+.field label{display:block;color:var(--muted);font-size:.85rem;margin:2px 0 6px}
+.dropzone{border:2px dashed var(--border);border-radius:14px;padding:26px;text-align:center;color:var(--muted);cursor:pointer;transition:border-color .15s;background:var(--panel)}
+.dropzone:hover{border-color:var(--cyan)}
+.dropzone.has-file{border-color:var(--cyan);color:var(--text)}
+.progress{height:10px;border-radius:6px;background:var(--panel2);overflow:hidden;margin-top:10px}
+.progress>div{height:100%;width:0;background:var(--grad);transition:width .2s}
+.err{color:#ff8080;font-size:.9rem;margin-top:8px}
+.ok{color:#7de3b0;font-size:.9rem;margin-top:8px}
+
+/* ---------- MINI PLAYER ---------- */
+.player{position:fixed;left:0;right:0;bottom:0;z-index:60;background:rgba(18,16,26,.97);backdrop-filter:blur(14px);border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom)}
+.player-progress{position:relative;height:4px;background:var(--panel2)}
+#playerProgressFill{height:100%;width:0;background:var(--grad)}
+#seekBar{position:absolute;top:-6px;left:0;width:100%;height:16px;opacity:0;cursor:pointer}
+.player-progress:hover #seekBar{opacity:1}
+.player-main{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;padding:8px 18px}
+.player-info{display:flex;gap:12px;align-items:center;min-width:0}
+.player-cover{width:46px;height:46px;border-radius:10px;background:linear-gradient(135deg,var(--purple),var(--bg2));display:flex;align-items:center;justify-content:center;font-size:1.3rem;overflow:hidden;flex:0 0 auto}
+.player-cover img{width:100%;height:100%;object-fit:cover}
+.player-meta{min-width:0}
+.player-meta>div{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#playerTitle{font-weight:700;font-size:.95rem}
+#playerArtist{color:var(--muted);font-size:.82rem}
+.player-controls{display:flex;gap:6px;align-items:center}
+.play{background:var(--grad);width:46px;height:46px;color:#fff;font-size:1.15rem;box-shadow:0 4px 14px rgba(224,64,154,.4)}
+.player-time{display:flex;gap:12px;align-items:center;justify-content:flex-end;font-size:.82rem;color:var(--muted)}
+.player-volume{display:flex;align-items:center;gap:6px}
+#volumeBar{width:90px;padding:0;height:4px;appearance:none;background:var(--panel2);border:none;border-radius:2px}
+#volumeBar::-webkit-slider-thumb{appearance:none;width:14px;height:14px;border-radius:50%;background:var(--cyan)}
+.queue-panel{position:absolute;right:12px;bottom:74px;width:min(360px,92vw);max-height:46vh;overflow:auto;background:var(--panel);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);z-index:70}
+.queue-head{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid var(--border);font-weight:700;position:sticky;top:0;background:var(--panel)}
+.q-item{display:grid;grid-template-columns:26px 1fr auto;gap:8px;padding:9px 14px;border-bottom:1px solid var(--border);font-size:.9rem;cursor:pointer;align-items:center}
+.q-item.current{background:linear-gradient(120deg,rgba(224,64,154,.18),rgba(34,211,238,.14))}
+.q-item .qi-title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.q-item .qi-artist{color:var(--muted);font-size:.78rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ---------- DIALOG / TOAST / LAIN ---------- */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:80}
+.dialog{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:90}
+.dialog-box{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:26px;max-width:92vw;width:400px;box-shadow:var(--shadow)}
+.dialog-box .dlg-btns{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+.toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%);background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:12px 20px;border-radius:12px;z-index:100;box-shadow:var(--shadow);max-width:88vw;text-align:center}
+.toast.err{border-color:#c0392b}
+.toast.ok{border-color:#2ecc71}
+.empty{border:2px dashed var(--border);border-radius:16px;padding:40px 20px;text-align:center;color:var(--muted)}
+.empty .big{font-size:2.2rem;margin-bottom:8px}
+.skeleton{background:linear-gradient(90deg,var(--panel) 25%,var(--panel2) 50%,var(--panel) 75%);background-size:200% 100%;animation:sk 1.2s infinite;border-radius:12px}
+@keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.sk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.sk-card{height:280px}
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.auth-card{background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:34px;width:min(420px,94vw);box-shadow:var(--shadow)}
+.auth-card img{width:64px;height:64px;border-radius:14px;margin:0 auto 14px;background:#fff}
+.auth-card h1{text-align:center;font-size:1.4rem;margin-bottom:4px}
+.auth-card .sub{text-align:center;color:var(--muted);font-size:.9rem;margin-bottom:22px}
+.auth-card .field{margin-bottom:14px}
+.auth-card .toggle{text-align:center;color:var(--cyan);margin-top:16px;font-size:.9rem;cursor:pointer}
+.lyrics{white-space:pre-wrap;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px;color:#d8d8e2}
+.detail-cover{width:100%;max-width:340px;aspect-ratio:1/1;border-radius:18px;object-fit:cover;box-shadow:var(--shadow);margin:0 auto}
+.back-link{color:var(--cyan);margin-bottom:14px;display:inline-block}
+.playlist-song-row .handle{cursor:grab;color:var(--muted)}
+
+/* ---------- RESPONSIF (mobile-first Android) ---------- */
+@media (max-width:900px){
+  #mainNav{display:none}
+  #hamburgerBtn{display:inline-flex}
+  .nav-actions #navUploadBtn{display:none}
+  .hero{grid-template-columns:1fr;padding:26px 20px}
+  .hero-art{max-height:220px;object-fit:cover}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .toolbar{grid-template-columns:1fr 1fr}
+  .form-grid{grid-template-columns:1fr}
+  .player-main{grid-template-columns:1fr auto;padding:6px 12px}
+  .player-time{display:none}
+  .song-row{grid-template-columns:40px 1fr auto}
+  .song-row .dur{display:none}
+}
+@media (max-width:520px){
+  #page{padding:16px 12px 130px}
+  .brand-text{display:none}
+  .player-cover{width:40px;height:40px}
+  .play{width:42px;height:42px}
+  .stats{gap:10px}
+}
+
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- NAVBAR -->
+  <header id="navbar" class="hidden">
+    <div class="nav-inner">
+      <a href="#/" class="brand">
+        <img id="navLogo" alt="Dharma Labs Digital" src="https://base44.app/api/apps/6ad6d8e4d50f54b774f395ec/files/mp/public/6ad6d8e4d50f54b774f395ec/a4ba4a47f_dharmalabs_logo_resmi.jpg">
+        <div class="brand-text"><strong>Dharma Musik</strong><span>Digital</span></div>
+      </a>
+      <nav id="mainNav">
+        <a href="#/" data-route="/">Beranda</a>
+        <a href="#/koleksi" data-route="/koleksi">Koleksi Lagu</a>
+        <a href="#/playlist" data-route="/playlist">Playlist</a>
+        <a href="#/manajemen" data-route="/manajemen">Manajemen Musik</a>
+      </nav>
+      <div class="nav-actions">
+        <button id="navUploadBtn" class="btn btn-primary btn-sm">+ Upload Lagu</button>
+        <button id="profileBtn" class="icon-btn" title="Profil">👤</button>
+      </div>
+      <button id="hamburgerBtn" class="icon-btn only-mobile" title="Menu">☰</button>
+    </div>
+    <nav id="mobileNav" class="mobile-menu hidden">
+      <a href="#/" data-route="/">Beranda</a>
+      <a href="#/koleksi" data-route="/koleksi">Koleksi Lagu</a>
+      <a href="#/playlist" data-route="/playlist">Playlist</a>
+      <a href="#/manajemen" data-route="/manajemen">Manajemen Musik</a>
+      <a href="#/upload" data-route="/upload">+ Upload Lagu</a>
+    </nav>
+  </header>
+
+  <!-- HALAMAN -->
+  <main id="page"></main>
+
+  <!-- MINI PLAYER -->
+  <footer id="player" class="player hidden">
+    <div class="player-bar">
+      <div class="player-progress"><div id="playerProgressFill"></div><input id="seekBar" type="range" min="0" max="1000" value="0"></div>
+      <div class="player-main">
+        <div class="player-info" id="playerInfo">
+          <div class="player-cover" id="playerCover">♪</div>
+          <div class="player-meta"><div id="playerTitle">—</div><div id="playerArtist">—</div></div>
+        </div>
+        <div class="player-controls">
+          <button id="shuffleBtn" class="icon-btn" title="Shuffle">🔀</button>
+          <button id="prevBtn" class="icon-btn" title="Sebelumnya">⏮</button>
+          <button id="playBtn" class="icon-btn play" title="Putar/Jeda">▶</button>
+          <button id="nextBtn" class="icon-btn" title="Berikutnya">⏭</button>
+          <button id="repeatBtn" class="icon-btn" title="Repeat">🔁</button>
+        </div>
+        <div class="player-time">
+          <span id="timeNow">0:00</span>
+          <div class="player-volume"><span>🔊</span><input id="volumeBar" type="range" min="0" max="100" value="90"></div>
+          <span id="timeTotal">0:00</span>
+          <button id="queueBtn" class="icon-btn" title="Antrean">☰</button>
+        </div>
+      </div>
+    </div>
+    <div id="queuePanel" class="queue-panel hidden">
+      <div class="queue-head">Antrean Lagu <button id="queueClose" class="icon-btn">✕</button></div>
+      <div id="queueList"></div>
+    </div>
+  </footer>
+
+  <!-- OVERLAY & DIALOG -->
+  <div id="overlay" class="overlay hidden"></div>
+  <div id="toast" class="toast hidden"></div>
+  <div id="dialog" class="dialog hidden"><div class="dialog-box"><div id="dialogMsg"></div><div id="dialogBtns"></div></div></div>
+</div>
+<script>
+
+/* ==== config.js ==== */
+/* ============================================================
+   config.js — konfigurasi publik. ANON KEY bukan rahasia.
+   Service-role key TIDAK PERNAH ada di frontend.
+   ============================================================ */
+const CONFIG = {
+  url: 'https://mzaxwsxpsfjhwailsrwz.supabase.co',
+  anonKey: 'sb_publishable_WqQuEVBC8BAPP5BBMjeCNQ_77TB-PAn', // <- diisi saat deployment (Settings -> API -> anon/publishable key)
+  brand: {
+    logo: 'https://base44.app/api/apps/6ad6d8e4d50f54b774f395ec/files/mp/public/6ad6d8e4d50f54b774f395ec/a4ba4a47f_dharmalabs_logo_resmi.jpg',
+    name: 'Dharma Musik Digital'
+  },
+  upload: { maxAudioMB: 50, maxCoverMB: 10 }
+};
+
+/* ==== supa.js ==== */
+/* ============================================================
+   supa.js — klien Supabase ringan (fetch murni, TANPA SDK).
+   KEAMANAN: frontend hanya memegang URL + anon key.
+   TIDAK ADA service-role key di frontend.
+   ============================================================ */
+const Supa = (() => {
+  let session = null;
+
+  function headers(withAuth = true, extra = {}) {
+    const h = { apikey: CONFIG.anonKey, ...extra };
+    if (withAuth && session?.access_token) h['Authorization'] = 'Bearer ' + session.access_token;
+    return h;
+  }
+
+  // ---------- AUTH ----------
+  async function signUp(email, password) {
+    const r = await fetch(`${CONFIG.url}/auth/v1/signup`, {
+      method: 'POST', headers: headers(false, { 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ email, password })
+    });
+    const j = await r.json();
+    if (!r.ok) throw new Error(msgAuth(j));
+    if (j.access_token) { saveSession(j); return j; }
+    return j; // perlu verifikasi email
+  }
+
+  async function signIn(email, password) {
+    const r = await fetch(`${CONFIG.url}/auth/v1/token?grant_type=password`, {
+      method: 'POST', headers: headers(false, { 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ email, password })
+    });
+    const j = await r.json();
+    if (!r.ok) throw new Error(msgAuth(j));
+    saveSession(j);
+    return j;
+  }
+
+  function msgAuth(j) {
+    const e = j.msg || j.error_description || j.error || 'Gagal masuk';
+    if (/invalid login credentials/i.test(e)) return 'Email atau kata sandi salah.';
+    if (/already registered/i.test(e)) return 'Email sudah terdaftar. Silakan masuk.';
+    return e;
+  }
+
+  function saveSession(j) {
+    session = { access_token: j.access_token, refresh_token: j.refresh_token, user: j.user, expires_at: (j.expires_at || 0) * 1000 };
+    localStorage.setItem('dmd_session', JSON.stringify(session));
+  }
+
+  function loadSession() {
+    try { session = JSON.parse(localStorage.getItem('dmd_session')); } catch (e) { session = null; }
+    return session;
+  }
+
+  async function refreshIfNearExpiry() {
+    if (!session) return;
+    if (session.expires_at && Date.now() < session.expires_at - 60000) return;
+    try {
+      const r = await fetch(`${CONFIG.url}/auth/v1/token?grant_type=refresh_token`, {
+        method: 'POST', headers: headers(false, { 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ refresh_token: session.refresh_token })
+      });
+      if (r.ok) saveSession(await r.json());
+    } catch (e) { /* offline: lanjut dengan token lama */ }
+  }
+
+  async function signOut() {
+    try {
+      await fetch(`${CONFIG.url}/auth/v1/logout`, { method: 'POST', headers: headers() });
+    } catch (e) { /* abaikan */ }
+    session = null;
+    localStorage.removeItem('dmd_session');
+  }
+
+  // ---------- REST (PostgREST) ----------
+  async function req(path, opts = {}) {
+    await refreshIfNearExpiry();
+    const r = await fetch(`${CONFIG.url}/rest/v1/${path}`, {
+      ...opts,
+      headers: headers(true, { 'Content-Type': 'application/json', ...(opts.headers || {}) })
+    });
+    if (r.status === 204) return null;
+    const text = await r.text();
+    let j = null; try { j = text ? JSON.parse(text) : null; } catch (e) { j = { message: text }; }
+    if (!r.ok) throw new Error(pgrstMsg(r, j));
+    return j;
+  }
+
+  function pgrstMsg(r, j) {
+    if (r.status === 401) return 'Sesi berakhir. Silakan masuk kembali.';
+    if (r.status === 403) return 'Tidak punya izin untuk aksi ini.';
+    if (r.status === 404) return 'Data tidak ditemukan.';
+    return j?.message || j?.error || ('Kesalahan server (' + r.status + ')');
+  }
+
+  function qs(filters = {}) {
+    const p = new URLSearchParams();
+    Object.entries(filters).forEach(([k, v]) => p.append(k, v));
+    return p.toString();
+  }
+
+  // songs / playlists / playlist_tracks (tabel dharma_*)
+  const rows = (table) => ({
+    list: (filters = {}) => req(`${table}?${qs(filters)}`),
+    get: (id) => req(`${table}?id=eq.${id}&select=*`).then(a => a && a[0] ? a[0] : null),
+    insert: (obj) => req(table, { method: 'POST', headers: { Prefer: 'return=representation' }, body: JSON.stringify(obj) }).then(a => a && a[0]),
+    update: (id, obj) => req(`${table}?id=eq.${id}`, { method: 'PATCH', headers: { Prefer: 'return=representation' }, body: JSON.stringify(obj) }).then(a => a && a[0]),
+    remove: (id) => req(`${table}?id=eq.${id}`, { method: 'DELETE', headers: { Prefer: 'return=representation' } })
+  });
+
+  const songs = rows('dharma_songs');
+  const playlists = rows('dharma_playlists');
+  const ptracks = rows('dharma_playlist_tracks');
+
+  // ---------- STORAGE ----------
+  function objectUrl(bucket, path) { return `${CONFIG.url}/storage/v1/object/${bucket}/${path}`; }
+  function publicUrl(bucket, path) { return `${CONFIG.url}/storage/v1/object/public/${bucket}/${path}`; }
+
+  // upload dengan progres nyata (XMLHttpRequest)
+  function upload(bucket, path, file, onProgress) {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', `${CONFIG.url}/storage/v1/object/${bucket}/${path}`);
+      xhr.setRequestHeader('apikey', CONFIG.anonKey);
+      if (session?.access_token) xhr.setRequestHeader('Authorization', 'Bearer ' + session.access_token);
+      xhr.setRequestHeader('x-upsert', 'true');
+      xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
+      xhr.upload.onprogress = (e) => { if (e.lengthComputable && onProgress) onProgress(Math.round(e.loaded / e.total * 100)); };
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) resolve(JSON.parse(xhr.responseText || '{}'));
+        else { let m = 'Upload gagal (' + xhr.status + ')'; try { m = JSON.parse(xhr.responseText).message || m; } catch (e) {} reject(new Error(m)); }
+      };
+      xhr.onerror = () => reject(new Error('Koneksi terputus saat upload. Periksa jaringan.'));
+      xhr.send(file);
+    });
+  }
+
+  // download TERAUTENTIKASI (bucket privat) -> blob
+  async function download(bucket, path) {
+    await refreshIfNearExpiry();
+    const r = await fetch(objectUrl(bucket, path), { headers: headers() });
+    if (!r.ok) {
+      if (r.status === 404) throw new Error('File audio tidak ditemukan (mungkin sudah dihapus).');
+      if (r.status === 401 || r.status === 403) throw new Error('Sesi berakhir atau tidak punya izin membaca file.');
+      throw new Error('File gagal dimuat (' + r.status + ').');
+    }
+    return await r.blob();
+  }
+
+  async function remove(bucket, path) {
+    const r = await fetch(objectUrl(bucket, path), { method: 'DELETE', headers: headers() });
+    if (!r.ok && r.status !== 404) throw new Error('Gagal menghapus file (' + r.status + ')');
+  }
+
+  return { signUp, signIn, signOut, loadSession, refreshIfNearExpiry, getSession: () => session,
+           songs, playlists, ptracks, upload, download, remove, objectUrl, publicUrl };
+})();
+
+/* ==== player.js ==== */
+/* ============================================================
+   player.js — mesin pemutar global (HTML5 Audio).
+   Fitur: play/pause, next/prev, seek, volume, shuffle,
+   repeat one/all, queue, blob terautentikasi + cache.
+   Pemutar TIDAK berhenti saat navigasi hash berubah.
+   ============================================================ */
+const Player = (() => {
+  const audio = new Audio();
+  audio.preload = 'auto';
+  let queue = [];          // daftar objek lagu
+  let index = -1;
+  let shuffle = false, repeat = 'off'; // off | all | one
+  let blobUrl = null;      // URL blob lagu aktif
+  const blobCache = new Map(); // songId -> blobUrl (cache sesi)
+  let loadingState = false;
+
+  const hooks = { onChange: [], onTime: [] };
+  const onChange = f => hooks.onChange.push(f);
+  const onTime = f => hooks.onTime.push(f);
+  const emit = () => hooks.onChange.forEach(f => { try { f(); } catch (e) {} });
+
+  const current = () => (index >= 0 && index < queue.length ? queue[index] : null);
+  const isPlaying = () => !audio.paused && !audio.ended;
+  const isLoading = () => loadingState;
+
+  function setQueue(songs, startId = null) {
+    queue = songs.slice();
+    index = startId ? queue.findIndex(s => s.id === startId) : 0;
+    if (index < 0) index = 0;
+    loadCurrent();
+  }
+  function addToQueue(song) { queue.push(song); emit(); }
+  function playSong(song) {
+    const i = queue.findIndex(s => s.id === song.id);
+    if (i >= 0) { index = i; loadCurrent(); }
+    else { queue.push(song); index = queue.length - 1; loadCurrent(); }
+  }
+  function nextIndex(manual = true) {
+    if (queue.length === 0) return -1;
+    if (shuffle && queue.length > 1) {
+      let n; do { n = Math.floor(Math.random() * queue.length); } while (n === index);
+      return n;
+    }
+    if (index + 1 < queue.length) return index + 1;
+    return (repeat === 'all' || !manual) ? 0 : -1; // habis antrean: berhenti kecuali repeat all
+  }
+  function next(manual = true) {
+    const n = nextIndex(manual);
+    if (n < 0) { audio.pause(); emit(); return; }
+    index = n; loadCurrent();
+  }
+  function prev() {
+    if (audio.currentTime > 3) { audio.currentTime = 0; return; }
+    if (index > 0) { index--; loadCurrent(); }
+    else if (queue.length) { index = queue.length - 1; loadCurrent(); }
+  }
+  function toggle() { if (!current()) return; if (isPlaying()) audio.pause(); else audio.play().catch(() => { Player.notify('Ketuk tombol putar untuk memulai.'); }); }
+
+  async function loadCurrent() {
+    const s = current();
+    emit();
+    if (!s || !s.audio_path) { if (s) Player.notify('Lagu ini tidak punya file audio.'); return; }
+    try {
+      loadingState = true; emit();
+      let url = blobCache.get(s.id);
+      if (!url) {
+        const blob = await Supa.download('dharma-audio', s.audio_path);
+        url = URL.createObjectURL(blob);
+        blobCache.set(s.id, url);
+        if (blobCache.size > 6) { // batasi cache ~6 lagu
+          const first = blobCache.keys().next().value;
+          const u = blobCache.get(first);
+          blobCache.delete(first);
+          if (u !== url) URL.revokeObjectURL(u);
+        }
+      }
+      if (blobUrl && blobUrl !== url && !Array.from(blobCache.values()).includes(blobUrl)) URL.revokeObjectURL(blobUrl);
+      blobUrl = url;
+      audio.src = url;
+      loadingState = false;
+      emit();
+      audio.play().catch(() => emit()); // autoplay terblokir: tunggu ketukan pemilik
+    } catch (e) {
+      loadingState = false;
+      Player.notify(e.message || 'Audio gagal dimuat.');
+      emit();
+    }
+  }
+
+  audio.addEventListener('timeupdate', () => hooks.onTime.forEach(f => { try { f(); } catch (e) {} }));
+  audio.addEventListener('loadedmetadata', () => emit());
+  audio.addEventListener('ended', () => {
+    if (repeat === 'one') { audio.currentTime = 0; audio.play().catch(() => {}); return; }
+    next(false);
+  });
+  audio.addEventListener('error', () => { if (audio.src) Player.notify('Audio gagal dimuat. Periksa koneksi atau file lagu.'); });
+  audio.addEventListener('play', () => emit());
+  audio.addEventListener('pause', () => emit());
+
+  return {
+    audio, setQueue, addToQueue, playSong, next, prev, toggle,
+    onChange, onTime, current, isPlaying, isLoading,
+    getQueue: () => queue, getIndex: () => index,
+    setShuffle: v => { shuffle = v; }, getShuffle: () => shuffle,
+    cycleRepeat: () => { repeat = repeat === 'off' ? 'all' : (repeat === 'all' ? 'one' : 'off'); return repeat; },
+    getRepeat: () => repeat,
+    seek: pct => { if (audio.duration && isFinite(pct)) audio.currentTime = Math.max(0, Math.min(1, pct)) * audio.duration; },
+    setVolume: v => { audio.volume = Math.max(0, Math.min(1, v)); },
+    getDuration: () => (isFinite(audio.duration) ? audio.duration : 0),
+    getCurrentTime: () => audio.currentTime,
+    notify: (m) => { if (window.UI) UI.toast(m, 'err'); },
+    invalidate: (songId) => { // lagu dihapus: buang dari antrean
+      const i = queue.findIndex(s => s.id === songId);
+      if (i >= 0) {
+        const u = blobCache.get(songId);
+        if (u) { URL.revokeObjectURL(u); blobCache.delete(songId); }
+        queue.splice(i, 1);
+        if (i < index) index--;
+        if (i === index) { audio.pause(); audio.removeAttribute('src'); index = -1; }
+        emit();
+      }
+    }
+  };
+})();
+
+/* ==== ui.js ==== */
+/* ============================================================
+   ui.js — komponen reusable: toast, dialog konfirmasi,
+   kartu lagu, kartu playlist, skeleton, empty state.
+   ============================================================ */
+const UI = (() => {
+  let toastTimer = null;
+
+  function toast(msg, kind = '') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast ' + kind;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.add('hidden'), 3200);
+  }
+
+  function confirmDialog(msg, okLabel = 'Hapus', danger = true) {
+    return new Promise(resolve => {
+      const dlg = document.getElementById('dialog');
+      document.getElementById('dialogMsg').textContent = msg;
+      const btns = document.getElementById('dialogBtns');
+      btns.innerHTML = '';
+      const mk = (label, cls, val) => {
+        const b = document.createElement('button');
+        b.className = 'btn ' + cls; b.textContent = label;
+        b.onclick = () => { dlg.classList.add('hidden'); resolve(val); };
+        btns.appendChild(b);
+      };
+      mk('Batal', 'btn-ghost', false);
+      mk(okLabel, danger ? 'btn-danger' : 'btn-primary', true);
+      dlg.classList.remove('hidden');
+    });
+  }
+
+  function fmtTime(sec) {
+    sec = Math.max(0, Math.round(sec || 0));
+    const m = Math.floor(sec / 60), s = sec % 60;
+    return m + ':' + String(s).padStart(2, '0');
+  }
+  function fmtDate(iso) {
+    try { return new Date(iso).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }); }
+    catch (e) { return '-'; }
+  }
+  function esc(s) {
+    return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+  function coverUrl(song) {
+    return song.cover_path ? Supa.publicUrl('dharma-covers', song.cover_path) : null;
+  }
+
+  function songCard(song, opts = {}) {
+    const el = document.createElement('div');
+    el.className = 'song-card';
+    el.dataset.id = song.id;
+    el.__song = song; // ikatan langsung untuk aksi play (tanpa lookup rapuh)
+    const cv = coverUrl(song);
+    el.innerHTML = `
+      <div class="song-cover" data-act="play">
+        ${cv ? `<img src="${esc(cv)}" alt="cover ${esc(song.title)}" loading="lazy">` : ''}
+        <div class="play-overlay">▶</div>
+        <div class="playing-badge"> Diputar</div>
+      </div>
+      <div class="song-body">
+        <div class="song-title">${esc(song.title)}</div>
+        <div class="song-artist">${esc(song.artist || 'Tanpa artis')}</div>
+        <div class="song-meta">${esc(song.album || 'Tanpa album')} · ${fmtTime(song.duration_seconds)}</div>
+        <div class="song-meta">Diunggah ${fmtDate(song.created_at)}</div>
+      </div>
+      <div class="song-actions">
+        <button class="icon-btn" data-act="play" title="Putar">▶</button>
+        <div class="spacer"></div>
+        ${opts.onAddToPlaylist ? `<button class="icon-btn" data-act="addpl" title="Tambahkan ke playlist">➕</button>` : ''}
+        <button class="icon-btn" data-act="edit" title="Edit">✏️</button>
+        <button class="icon-btn" data-act="del" title="Hapus">🗑</button>
+      </div>`;
+    return el;
+  }
+
+  function songRow(song, extra = null) {
+    const el = document.createElement('div');
+    el.className = 'song-row';
+    el.dataset.id = song.id;
+    el.__song = song;
+    const cv = coverUrl(song);
+    el.innerHTML = `
+      <img src="${cv ? esc(cv) : ''}" alt="" loading="lazy" style="${cv ? '' : 'visibility:hidden'}">
+      <div class="meta"><div class="t">${esc(song.title)}</div><div class="a">${esc(song.artist || 'Tanpa artis')}${song.album ? ' · ' + esc(song.album) : ''}</div></div>
+      <div class="dur">${fmtTime(song.duration_seconds)}</div>
+      <div class="racts">
+        <button class="icon-btn" data-act="play" title="Putar">▶</button>
+        <button class="icon-btn" data-act="del" title="Keluar dari playlist">✕</button>
+      </div>`;
+    if (extra) el.insertBefore(extra, el.firstChild);
+    return el;
+  }
+
+  function playlistCard(pl, count) {
+    const el = document.createElement('div');
+    el.className = 'playlist-card';
+    el.dataset.id = pl.id;
+    const cv = pl.cover_path ? Supa.publicUrl('dharma-covers', pl.cover_path) : null;
+    el.innerHTML = `
+      <div class="icon">${cv ? `<img src="${esc(cv)}" style="-webkit-background-clip:0;width:100%;border-radius:12px" alt="">` : '🎵'}</div>
+      <h3>${esc(pl.name)}</h3>
+      <div class="count">${count} lagu · dibuat ${fmtDate(pl.created_at)}</div>`;
+    return el;
+  }
+
+  function skeletonGrid(n = 8) {
+    const w = document.createElement('div');
+    w.className = 'sk-grid';
+    for (let i = 0; i < n; i++) { const d = document.createElement('div'); d.className = 'skeleton sk-card'; w.appendChild(d); }
+    return w;
+  }
+
+  function empty(icon, msg, btnLabel, btnAction) {
+    const el = document.createElement('div');
+    el.className = 'empty';
+    el.innerHTML = `<div class="big">${icon}</div><div>${esc(msg)}</div>`;
+    if (btnLabel) {
+      const b = document.createElement('button');
+      b.className = 'btn btn-primary'; b.style.marginTop = '16px'; b.textContent = btnLabel;
+      b.onclick = btnAction;
+      el.appendChild(b);
+    }
+    return el;
+  }
+
+  return { toast, confirmDialog, fmtTime, fmtDate, esc, coverUrl, songCard, songRow, playlistCard, skeletonGrid, empty };
+})();
+
+/* ==== pages.js ==== */
+/* ============================================================
+   pages.js — seluruh halaman: beranda, koleksi, playlist,
+   detail playlist, manajemen, upload, edit, login/daftar.
+   ============================================================ */
+const Pages = (() => {
+  const $ = (sel, root) => (root || document).querySelector(sel);
+
+  function requireAuth() {
+    if (!Supa.getSession()) { location.hash = '#/login'; return false; }
+    return true;
+  }
+
+  // ---------------- HALAMAN LOGIN ----------------
+  function login(mode = 'in') {
+    const page = $('#page');
+    page.innerHTML = `
+      <div class="auth-wrap"><div class="auth-card">
+        <img src="${CONFIG.brand.logo}" alt="Dharma Labs Digital">
+        <h1>${CONFIG.brand.name}</h1>
+        <div class="sub">${mode === 'in' ? 'Masuk ke perpustakaan musik Anda' : 'Buat akun pemilik pertama'}</div>
+        <div class="field"><label>Email</label><input id="authEmail" type="email" autocomplete="email" placeholder="email@contoh.com"></div>
+        <div class="field"><label>Kata sandi</label><input id="authPass" type="password" autocomplete="current-password" placeholder="Minimal 6 karakter"></div>
+        <div class="err hidden" id="authErr"></div>
+        <button class="btn btn-primary" id="authGo" style="width:100%;margin-top:6px">${mode === 'in' ? 'Masuk' : 'Daftar'}</button>
+        <div class="toggle" id="authToggle">${mode === 'in' ? 'Belum punya akun? Daftar di sini' : 'Sudah punya akun? Masuk di sini'}</div>
+      </div></div>`;
+    const go = async () => {
+      const email = $('#authEmail').value.trim(), pass = $('#authPass').value;
+      const err = $('#authErr');
+      err.classList.add('hidden');
+      if (!email || !pass) { err.textContent = 'Email dan kata sandi wajib diisi.'; err.classList.remove('hidden'); return; }
+      if (mode === 'up' && pass.length < 6) { err.textContent = 'Kata sandi minimal 6 karakter.'; err.classList.remove('hidden'); return; }
+      $('#authGo').disabled = true; $('#authGo').textContent = 'Memproses...';
+      try {
+        if (mode === 'in') await Supa.signIn(email, pass);
+        else {
+          const j = await Supa.signUp(email, pass);
+          if (!j.access_token) { err.textContent = 'Pendaftaran berhasil. Silakan verifikasi email lalu masuk.'; err.classList.remove('hidden'); $('#authGo').disabled = false; $('#authGo').textContent = 'Daftar'; return; }
+        }
+        UI.toast(mode === 'in' ? 'Selamat datang kembali.' : 'Akun berhasil dibuat.', 'ok');
+        App.boot();
+      } catch (e) {
+        err.textContent = e.message; err.classList.remove('hidden');
+        $('#authGo').disabled = false; $('#authGo').textContent = mode === 'in' ? 'Masuk' : 'Daftar';
+      }
+    };
+    $('#authGo').onclick = go;
+    $('#authPass').addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
+    $('#authToggle').onclick = () => login(mode === 'in' ? 'up' : 'in');
+  }
+
+  // ---------------- BERANDA ----------------
+  async function home() {
+    if (!requireAuth()) return;
+    const page = $('#page');
+    page.innerHTML = `
+      <section class="hero">
+        <div>
+          <h1>Musik, Cerita, dan Karya Original.</h1>
+          <p>Satu ruang digital untuk menyimpan, mengelola, dan menikmati setiap karya musik Anda.</p>
+          <div class="hero-actions">
+            <button class="btn btn-primary" onclick="location.hash='#/upload'">Upload Lagu Pertama</button>
+            <button class="btn btn-ghost" onclick="location.hash='#/koleksi'">Lihat Koleksi</button>
+          </div>
+        </div>
+        <img class="hero-art" src="https://media.base44.com/images/public/6ad6d8e4d50f54b774f395ec/b555ba476_generated_image.png" alt="Artwork audio Dharma Musik Digital">
+      </section>
+      <section class="section" id="statsWrap"></section>
+      <section class="section">
+        <div class="section-head"><h2>Terakhir Ditambahkan</h2>
+          <a class="btn btn-ghost btn-sm" href="#/koleksi">Lihat semua</a></div>
+        <div class="song-grid" id="recentGrid"></div>
+      </section>`;
+    $('#statsWrap').innerHTML = '<div class="stats">' + '<div class="stat"><div class="skeleton" style="height:34px"></div><div class="lbl">Memuat…</div></div>'.repeat(4) + '</div>';
+    $('#recentGrid').innerHTML = '';
+    $('#recentGrid').appendChild(UI.skeletonGrid(4));
+    try {
+      const songs = await Supa.songs.list({ select: '*', order: 'created_at.desc', limit: 100 });
+      const pls = await Supa.playlists.list({ select: '*', order: 'created_at.desc' });
+      const totalDur = songs.reduce((a, s) => a + (Number(s.duration_seconds) || 0), 0);
+      const stat = (num, lbl) => `<div class="stat"><div class="num">${num}</div><div class="lbl">${lbl}</div></div>`;
+      $('#statsWrap').innerHTML = `<div class="stats">
+        ${stat(songs.length, 'Total Lagu')}
+        ${stat(pls.length, 'Total Playlist')}
+        ${stat(UI.fmtTime(totalDur), 'Total Durasi Koleksi')}
+        ${stat(songs[0] ? UI.esc(songs[0].title).slice(0, 16) + (songs[0].title.length > 16 ? '…' : '') : '—', 'Lagu Terakhir Ditambahkan')}
+      </div>`;
+      const grid = $('#recentGrid'); grid.innerHTML = '';
+      if (!songs.length) { grid.appendChild(UI.empty('🎵', 'Belum ada lagu. Unggah karya pertama Anda.', 'Upload Lagu Pertama', () => location.hash = '#/upload')); return; }
+      songs.slice(0, 8).forEach(s => grid.appendChild(UI.songCard(s, { onAddToPlaylist: true })));
+    } catch (e) {
+      UI.toast(e.message, 'err');
+      $('#recentGrid').innerHTML = ''; $('#recentGrid').appendChild(UI.empty('⚠️', e.message));
+    }
+  }
+
+  // ---------------- KOLEKSI LAGU ----------------
+  async function koleksi() {
+    if (!requireAuth()) return;
+    const page = $('#page');
+    page.innerHTML = `
+      <div class="page-title">Koleksi Lagu</div>
+      <div class="page-sub">Seluruh karya original Anda dalam satu tempat.</div>
+      <div class="toolbar">
+        <input id="qTitle" type="search" placeholder="Cari judul atau artis…">
+        <select id="fAlbum"><option value="">Semua album</option></select>
+        <select id="fGenre"><option value="">Semua genre</option></select>
+        <select id="fSort">
+          <option value="created_at.desc">Terbaru</option>
+          <option value="title.asc">Judul A-Z</option>
+          <option value="artist.asc">Artis A-Z</option>
+        </select>
+      </div>
+      <div id="songArea"></div>`;
+    const area = $('#songArea');
+    let allSongs = [];
+    const render = () => {
+      const q = $('#qTitle').value.trim().toLowerCase();
+      const album = $('#fAlbum').value, genre = $('#fGenre').value;
+      const list = allSongs.filter(s =>
+        (!q || (s.title || '').toLowerCase().includes(q) || (s.artist || '').toLowerCase().includes(q)) &&
+        (!album || s.album === album) && (!genre || s.genre === genre));
+      area.innerHTML = '';
+      if (!list.length) { area.appendChild(UI.empty('🎵', q || album || genre ? 'Tidak ada lagu yang cocok dengan pencarian.' : 'Belum ada lagu. Unggah karya pertama Anda.', q || album || genre ? null : 'Upload Lagu', () => location.hash = '#/upload')); return; }
+      const grid = document.createElement('div'); grid.className = 'song-grid';
+      list.forEach(s => grid.appendChild(UI.songCard(s, { onAddToPlaylist: true })));
+      area.appendChild(grid);
+    };
+    try {
+      area.appendChild(UI.skeletonGrid());
+      allSongs = await Supa.songs.list({ select: '*', order: 'created_at.desc', limit: 500 });
+      const albums = [...new Set(allSongs.map(s => s.album).filter(Boolean))].sort();
+      const genres = [...new Set(allSongs.map(s => s.genre).filter(Boolean))].sort();
+      albums.forEach(a => { const o = document.createElement('option'); o.textContent = a; $('#fAlbum').appendChild(o); });
+      genres.forEach(g => { const o = document.createElement('option'); o.textContent = g; $('#fGenre').appendChild(o); });
+      render();
+    } catch (e) { area.innerHTML = ''; area.appendChild(UI.empty('⚠️', e.message)); }
+    ['qTitle', 'fAlbum', 'fGenre'].forEach(id => $('#' + id).addEventListener('input', render));
+    $('#fSort').addEventListener('change', async () => {
+      const [f, dir] = $('#fSort').value.split('.');
+      const map = { created_at: 'created_at', title: 'title', artist: 'artist' };
+      allSongs.sort((a, b) => { const va = a[map[f]] || '', vb = b[map[f]] || '';
+        return dir === 'asc' ? String(va).localeCompare(String(vb)) : String(vb).localeCompare(String(va)); });
+      if (map[f] !== 'created_at') render();
+      else { const sel = $('#fSort'); sel.value = 'created_at.desc'; render(); }
+    });
+  }
+
+  // ---------------- PLAYLIST ----------------
+  async function playlistIndex() {
+    if (!requireAuth()) return;
+    const page = $('#page');
+    page.innerHTML = `<div class="section-head"><div><div class="page-title">Playlist</div>
+      <div class="page-sub">Kelola dan nikmati koleksi dalam susunan Anda sendiri.</div></div>
+      <button class="btn btn-primary" id="newPlBtn">+ Buat Playlist</button></div>
+      <div id="plArea"></div>`;
+    const area = $('#plArea');
+    area.appendChild(UI.skeletonGrid(4));
+    $('#newPlBtn').onclick = () => editPlaylist(null);
+    try {
+      const [pls, tracks] = await Promise.all([
+        Supa.playlists.list({ select: '*', order: 'created_at.desc' }),
+        Supa.ptracks.list({ select: 'playlist_id', limit: 1000 })]);
+      const counts = {}; tracks.forEach(t => counts[t.playlist_id] = (counts[t.playlist_id] || 0) + 1);
+      area.innerHTML = '';
+      if (!pls.length) { area.appendChild(UI.empty('📂', 'Belum ada playlist. Buat satu untuk mengelompokkan lagu favorit Anda.', 'Buat Playlist Pertama', () => editPlaylist(null))); return; }
+      const grid = document.createElement('div'); grid.className = 'playlist-grid';
+      pls.forEach(p => grid.appendChild(UI.playlistCard(p, counts[p.id] || 0)));
+      area.appendChild(grid);
+    } catch (e) { area.innerHTML = ''; area.appendChild(UI.empty('⚠️', e.message)); }
+  }
+
+  async function playlistDetail(id) {
+    if (!requireAuth()) return;
+    const page = $('#page');
+    page.innerHTML = '<div class="skeleton" style="height:300px"></div>';
+    try {
+      const pl = await Supa.playlists.get(id);
+      if (!pl) { UI.toast('Playlist tidak ditemukan.', 'err'); location.hash = '#/playlist'; return; }
+      const tracks = await Supa.ptracks.list({ select: '*', playlist_id: `eq.${id}`, order: 'position.asc' });
+      const ids = tracks.map(t => t.song_id);
+      const songs = ids.length ? await Supa.songs.list({ select: '*', id: `in.(${ids.join(',')})` }) : [];
+      const byId = {}; songs.forEach(s => byId[s.id] = s);
+      const ordered = tracks.map((t, i) => ({ trackId: t.id, pos: i + 1, song: byId[t.song_id] })).filter(x => x.song);
+      const totalDur = ordered.reduce((a, x) => a + Number(x.song.duration_seconds || 0), 0);
+      page.innerHTML = `
+        <a href="#/playlist" class="back-link">← Kembali ke Playlist</a>
+        <div class="section-head"><div><div class="page-title">${UI.esc(pl.name)}</div>
+          <div class="page-sub">${UI.esc(pl.description || 'Tanpa deskripsi')} · ${ordered.length} lagu · ${UI.fmtTime(totalDur)}</div></div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-primary btn-sm" id="plPlayAll">▶ Putar Semua</button>
+            <button class="btn btn-ghost btn-sm" id="plEdit">✏️ Edit</button>
+            <button class="btn btn-danger btn-sm" id="plDel">🗑 Hapus</button>
+          </div></div>
+        <div id="plSongs"></div>`;
+      const wrap = $('#plSongs');
+      if (!ordered.length) wrap.appendChild(UI.empty('🎵', 'Playlist masih kosong. Tambahkan lagu dari Koleksi Lagu.', 'Tambah dari Koleksi', () => location.hash = '#/koleksi'));
+      else ordered.forEach(x => {
+        const up = document.createElement('button');
+        up.className = 'icon-btn'; up.textContent = '↑'; up.title = 'Naikkan urutan';
+        up.style.width = '30px'; up.style.height = '30px'; up.style.fontSize = '.8rem';
+        up.onclick = async () => {
+          const i = ordered.indexOf(x); if (i <= 0) return;
+          try {
+            await Supa.ptracks.update(ordered[i - 1].trackId, { position: i + 1 });
+            await Supa.ptracks.update(x.trackId, { position: i });
+            playlistDetail(id);
+          } catch (e) { UI.toast(e.message, 'err'); }
+        };
+        const row = UI.songRow(x.song, up);
+        row.querySelector('[data-act="del"]').title = 'Keluarkan dari playlist';
+        wrap.appendChild(row);
+      });
+      $('#plPlayAll').onclick = () => { if (ordered.length) Player.setQueue(ordered.map(x => x.song), ordered[0].song.id); else UI.toast('Playlist kosong.', 'err'); };
+      $('#plEdit').onclick = () => editPlaylist(pl);
+      $('#plDel').onclick = async () => {
+        if (await UI.confirmDialog(`Hapus playlist "${pl.name}"? Lagu di dalamnya TIDAK ikut terhapus.`)) {
+          try { await Supa.playlists.remove(id); UI.toast('Playlist dihapus. Lagu tetap aman di koleksi.', 'ok'); location.hash = '#/playlist'; }
+          catch (e) { UI.toast(e.message, 'err'); }
+        }
+      };
+      page.dataset.plId = id;
+    } catch (e) { UI.toast(e.message, 'err'); }
+  }
+
+  function editPlaylist(pl) {
+    const dlg = document.getElementById('dialog');
+    document.getElementById('dialogMsg').innerHTML = `
+      <strong>${pl ? 'Edit Playlist' : 'Buat Playlist Baru'}</strong>
+      <div class="field" style="margin-top:12px"><label>Nama playlist</label><input id="plName" value="${pl ? UI.esc(pl.name) : ''}"></div>
+      <div class="field"><label>Deskripsi (opsional)</label><textarea id="plDesc" rows="2">${pl ? UI.esc(pl.description || '') : ''}</textarea></div>`;
+    const btns = document.getElementById('dialogBtns');
+    btns.innerHTML = '';
+    const cancel = document.createElement('button'); cancel.className = 'btn btn-ghost'; cancel.textContent = 'Batal';
+    cancel.onclick = () => dlg.classList.add('hidden');
+    const save = document.createElement('button'); save.className = 'btn btn-primary'; save.textContent = pl ? 'Simpan' : 'Buat';
+    save.onclick = async () => {
+      const name = document.getElementById('plName').value.trim();
+      if (!name) { UI.toast('Nama playlist wajib diisi.', 'err'); return; }
+      try {
+        const uid = Supa.getSession().user.id;
+        if (pl) { await Supa.playlists.update(pl.id, { name, description: document.getElementById('plDesc').value.trim() }); UI.toast('Playlist diperbarui.', 'ok'); }
+        else { await Supa.playlists.insert({ owner_id: uid, name, description: document.getElementById('plDesc').value.trim() }); UI.toast('Playlist dibuat.', 'ok'); }
+        dlg.classList.add('hidden');
+        playlistIndex();
+      } catch (e) { UI.toast(e.message, 'err'); }
+    };
+    btns.appendChild(cancel); btns.appendChild(save);
+    dlg.classList.remove('hidden');
+  }
+
+  // ---------------- MANAJEMEN ----------------
+  async function manajemen() {
+    if (!requireAuth()) return;
+    const page = $('#page');
+    page.innerHTML = `<div class="page-title">Manajemen Musik</div>
+      <div class="page-sub">Edit dan hapus lagu, serta unggah karya baru.</div>
+      <div class="section-head"><h2>Semua Lagu</h2>
+        <button class="btn btn-primary btn-sm" onclick="location.hash='#/upload'">+ Upload Lagu</button></div>
+      <div id="mgArea"></div>`;
+    const area = $('#mgArea');
+    area.appendChild(UI.skeletonGrid(6));
+    try {
+      const songs = await Supa.songs.list({ select: '*', order: 'title.asc', limit: 500 });
+      area.innerHTML = '';
+      if (!songs.length) { area.appendChild(UI.empty('🎵', 'Belum ada lagu untuk dikelola.', 'Upload Lagu Pertama', () => location.hash = '#/upload')); return; }
+      const grid = document.createElement('div'); grid.className = 'song-grid';
+      songs.forEach(s => grid.appendChild(UI.songCard(s, {})));
+      area.appendChild(grid);
+    } catch (e) { area.innerHTML = ''; area.appendChild(UI.empty('⚠️', e.message)); }
+  }
+
+  // ---------------- UPLOAD ----------------
+  function upload() {
+    if (!requireAuth()) return;
+    const page = $('#page');
+    page.innerHTML = `
+      <div class="page-title">Upload Lagu</div>
+      <div class="page-sub">Format audio: MP3, WAV, OGG, M4A, FLAC (maks ${CONFIG.upload.maxAudioMB} MB). Cover: JPG/PNG/WebP (maks ${CONFIG.upload.maxCoverMB} MB).</div>
+      <div class="form-grid">
+        <div class="field full">
+          <label>File Audio *</label>
+          <div class="dropzone" id="dzAudio">🎧 Ketuk untuk memilih file audio (MP3/WAV/dll)</div>
+          <div class="progress hidden" id="pgAudioWrap"><div id="pgAudio"></div></div>
+        </div>
+        <div class="field full">
+          <label>Cover Album (opsional)</label>
+          <div class="dropzone" id="dzCover">🖼 Ketuk untuk memilih gambar (JPG/PNG/WebP)</div>
+          <div class="progress hidden" id="pgCoverWrap"><div id="pgCover"></div></div>
+        </div>
+        <div class="field"><label>Judul Lagu *</label><input id="upTitle" placeholder="Judul lagu"></div>
+        <div class="field"><label>Nama Artis</label><input id="upArtist" placeholder="Nama artis"></div>
+        <div class="field"><label>Album</label><input id="upAlbum" placeholder="Nama album"></div>
+        <div class="field"><label>Genre</label><input id="upGenre" placeholder="mis. Pop, Dangdut, Instrumen"></div>
+        <div class="field"><label>Tahun Rilis</label><input id="upYear" type="number" min="1900" max="2100" placeholder="mis. 2026"></div>
+        <div class="field"><label>Status</label><select id="upVis"><option value="private">Privat (hanya saya)</option><option value="public">Publik</option></select></div>
+        <div class="field full"><label>Deskripsi</label><textarea id="upDesc" rows="2" placeholder="Cerita di balik lagu ini (opsional)"></textarea></div>
+        <div class="field full"><label>Lirik (opsional)</label><textarea id="upLyrics" rows="4" placeholder="Tulis lirik lagu di sini…"></textarea></div>
+        <div class="full"><div class="err hidden" id="upErr"></div><div class="ok hidden" id="upOk"></div>
+          <button class="btn btn-primary" id="upGo" style="margin-top:14px">Simpan & Unggah</button></div>
+      </div>`;
+    let audioFile = null, coverFile = null, audioDur = 0;
+    const dzA = $('#dzAudio'), dzC = $('#dzCover');
+    const AUDIO_TYPES = ['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/x-wav', 'audio/wave', 'audio/ogg', 'audio/webm', 'audio/flac', 'audio/x-flac', 'audio/aac', 'audio/mp4', 'audio/x-m4a', 'audio/m4a'];
+    const COVER_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+
+    const pickAudio = () => {
+      const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'audio/*,.mp3,.wav,.ogg,.m4a,.flac,.aac';
+      inp.onchange = () => {
+        const f = inp.files[0]; if (!f) return;
+        if (!AUDIO_TYPES.includes(f.type) && !/\.(mp3|wav|ogg|m4a|flac|aac)$/i.test(f.name)) { UI.toast('Jenis file audio tidak didukung.', 'err'); return; }
+        if (f.size > CONFIG.upload.maxAudioMB * 1024 * 1024) { UI.toast(`Ukuran melebihi ${CONFIG.upload.maxAudioMB} MB.`, 'err'); return; }
+        audioFile = f;
+        dzA.textContent = '🎧 ' + f.name + ' (' + (f.size / 1048576).toFixed(1) + ' MB)';
+        dzA.classList.add('has-file');
+        if (!$('#upTitle').value) $('#upTitle').value = f.name.replace(/\.[^.]+$/, '');
+        // baca durasi nyata dari metadata audio
+        const a = document.createElement('audio');
+        a.preload = 'metadata';
+        a.onloadedmetadata = () => { audioDur = isFinite(a.duration) ? Math.round(a.duration) : 0; };
+        a.src = URL.createObjectURL(f);
+      };
+      inp.click();
+    };
+    const pickCover = () => {
+      const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/jpeg,image/png,image/webp';
+      inp.onchange = () => {
+        const f = inp.files[0]; if (!f) return;
+        if (!COVER_TYPES.includes(f.type)) { UI.toast('Cover harus JPG, PNG, atau WebP.', 'err'); return; }
+        if (f.size > CONFIG.upload.maxCoverMB * 1024 * 1024) { UI.toast(`Ukuran cover melebihi ${CONFIG.upload.maxCoverMB} MB.`, 'err'); return; }
+        coverFile = f;
+        dzC.textContent = '🖼 ' + f.name;
+        dzC.classList.add('has-file');
+      };
+      inp.click();
+    };
+    dzA.onclick = pickAudio; dzC.onclick = pickCover;
+
+    $('#upGo').onclick = async () => {
+      const err = $('#upErr'), ok = $('#upOk');
+      err.classList.add('hidden'); ok.classList.add('hidden');
+      const title = $('#upTitle').value.trim();
+      if (!audioFile) { err.textContent = 'Pilih file audio dulu.'; err.classList.remove('hidden'); return; }
+      if (!title) { err.textContent = 'Judul lagu wajib diisi.'; err.classList.remove('hidden'); return; }
+      const btn = $('#upGo'); btn.disabled = true; btn.textContent = 'Mengunggah…';
+      const uid = Supa.getSession().user.id;
+      let songId = null;
+      try {
+        // 1. buat baris metadata dulu agar punya id file yang stabil
+        const song = await Supa.songs.insert({
+          owner_id: uid, title,
+          artist: $('#upArtist').value.trim(), album: $('#upAlbum').value.trim(),
+          genre: $('#upGenre').value.trim(),
+          release_year: $('#upYear').value ? Number($('#upYear').value) : null,
+          description: $('#upDesc').value.trim(), lyrics: $('#upLyrics').value.trim(),
+          duration_seconds: audioDur, visibility: $('#upVis').value
+        });
+        songId = song.id;
+        // 2. unggah audio (privat) dengan progres
+        const audioExt = (audioFile.name.match(/\.([^.]+)$/) || [, 'mp3'])[1].toLowerCase();
+        const audioPath = `${uid}/${songId}.${audioExt}`;
+        $('#pgAudioWrap').classList.remove('hidden');
+        await Supa.upload('dharma-audio', audioPath, audioFile, p => $('#pgAudio').style.width = p + '%');
+        await Supa.songs.update(songId, { audio_path: audioPath });
+        // 3. unggah cover (opsional)
+        let coverPath = null;
+        if (coverFile) {
+          const cExt = coverFile.type === 'image/png' ? 'png' : (coverFile.type === 'image/webp' ? 'webp' : 'jpg');
+          coverPath = `${uid}/${songId}.${cExt}`;
+          $('#pgCoverWrap').classList.remove('hidden');
+          await Supa.upload('dharma-covers', coverPath, coverFile, p => $('#pgCover').style.width = p + '%');
+          await Supa.songs.update(songId, { cover_path: coverPath });
+        }
+        ok.textContent = `Lagu "${title}" berhasil diunggah dan siap diputar.`;
+        ok.classList.remove('hidden');
+        UI.toast('Upload berhasil.', 'ok');
+        btn.textContent = 'Selesai';
+        setTimeout(() => { location.hash = '#/koleksi'; }, 900);
+      } catch (e) {
+        // bersihkan baris setengah jadi supaya tidak ada duplikat data
+        if (songId) { try { await Supa.songs.remove(songId); } catch (e2) {} }
+        err.textContent = e.message + ' Lagu tidak tersimpan — silakan coba lagi.';
+        err.classList.remove('hidden');
+        btn.disabled = false; btn.textContent = 'Simpan & Unggah';
+      }
+    };
+  }
+
+  // ---------------- EDIT LAGU ----------------
+  function editSong(songId) {
+    if (!requireAuth()) return;
+    const esc_ = UI.esc;
+    Supa.songs.get(songId).then(song => {
+      if (!song) { UI.toast('Lagu tidak ditemukan.', 'err'); return; }
+      const dlg = document.getElementById('dialog');
+      const cv = UI.coverUrl(song);
+      document.getElementById('dialogMsg').innerHTML = `
+        <strong>Edit Lagu</strong>
+        ${cv ? `<img src="${esc_(cv)}" style="width:70px;height:70px;border-radius:10px;margin:10px 0" alt="">` : ''}
+        <div class="field" style="margin-top:10px"><label>Judul</label><input id="edTitle" value="${esc_(song.title)}"></div>
+        <div class="field"><label>Artis</label><input id="edArtist" value="${esc_(song.artist || '')}"></div>
+        <div class="field"><label>Album</label><input id="edAlbum" value="${esc_(song.album || '')}"></div>
+        <div class="field"><label>Genre</label><input id="edGenre" value="${esc_(song.genre || '')}"></div>
+        <div class="field"><label>Tahun</label><input id="edYear" type="number" value="${song.release_year || ''}"></div>
+        <div class="field"><label>Status</label><select id="edVis"><option value="private"${song.visibility === 'private' ? ' selected' : ''}>Privat</option><option value="public"${song.visibility === 'public' ? ' selected' : ''}>Publik</option></select></div>
+        <div class="field"><label>Deskripsi</label><textarea id="edDesc" rows="2">${esc_(song.description || '')}</textarea></div>
+        <div class="field"><label>Lirik</label><textarea id="edLyrics" rows="4">${esc_(song.lyrics || '')}</textarea></div>
+        <div class="field"><label>Ganti cover (JPG/PNG/WebP)</label><input id="edCover" type="file" accept="image/jpeg,image/png,image/webp"></div>`;
+      const btns = document.getElementById('dialogBtns');
+      btns.innerHTML = '';
+      const cancel = document.createElement('button'); cancel.className = 'btn btn-ghost'; cancel.textContent = 'Batal';
+      cancel.onclick = () => dlg.classList.add('hidden');
+      const save = document.createElement('button'); save.className = 'btn btn-primary'; save.textContent = 'Simpan';
+      save.onclick = async () => {
+        try {
+          await Supa.songs.update(songId, {
+            title: document.getElementById('edTitle').value.trim() || song.title,
+            artist: document.getElementById('edArtist').value.trim(),
+            album: document.getElementById('edAlbum').value.trim(),
+            genre: document.getElementById('edGenre').value.trim(),
+            release_year: document.getElementById('edYear').value ? Number(document.getElementById('edYear').value) : null,
+            description: document.getElementById('edDesc').value.trim(),
+            lyrics: document.getElementById('edLyrics').value.trim(),
+            visibility: document.getElementById('edVis').value
+          });
+          const f = document.getElementById('edCover').files[0];
+          if (f) {
+            const cExt = f.type === 'image/png' ? 'png' : (f.type === 'image/webp' ? 'webp' : 'jpg');
+            const newPath = `${Supa.getSession().user.id}/${songId}.${cExt}`;
+            await Supa.upload('dharma-covers', newPath, f);
+            if (song.cover_path && song.cover_path !== newPath) await Supa.remove('dharma-covers', song.cover_path);
+            await Supa.songs.update(songId, { cover_path: newPath });
+          }
+          UI.toast('Perubahan tersimpan.', 'ok');
+          dlg.classList.add('hidden');
+          App.rerender();
+        } catch (e) { UI.toast(e.message, 'err'); }
+      };
+      btns.appendChild(cancel); btns.appendChild(save);
+      dlg.classList.remove('hidden');
+    }).catch(e => UI.toast(e.message, 'err'));
+  }
+
+  // ---------------- AKSI BERSAMA ----------------
+  async function deleteSong(songId) {
+    if (!requireAuth()) return;
+    const song = await Supa.songs.get(songId).catch(() => null);
+    if (!song) { UI.toast('Lagu tidak ditemukan.', 'err'); return; }
+    if (await UI.confirmDialog(`Hapus lagu "${song.title}"? File audio dan cover-nya juga dihapus permanen.`)) {
+      try {
+        // 1. file dari storage, 2. baris DB (urutan aman: tanpa data yatim)
+        if (song.audio_path) await Supa.remove('dharma-audio', song.audio_path);
+        if (song.cover_path) await Supa.remove('dharma-covers', song.cover_path);
+        await Supa.songs.remove(songId);
+        Player.invalidate(songId);
+        UI.toast('Lagu dan filenya dihapus.', 'ok');
+        App.rerender();
+      } catch (e) { UI.toast(e.message, 'err'); }
+    }
+  }
+
+  function addSongToPlaylist(songId) {
+    Supa.playlists.list({ select: 'id,name', order: 'name.asc' }).then(pls => {
+      if (!pls.length) { UI.toast('Belum ada playlist. Buat playlist dulu di halaman Playlist.', 'err'); return; }
+      const dlg = document.getElementById('dialog');
+      document.getElementById('dialogMsg').innerHTML = `<strong>Tambahkan ke Playlist</strong><div id="plPickList" style="margin-top:10px"></div>`;
+      const list = document.getElementById('plPickList');
+      pls.forEach(p => {
+        const b = document.createElement('button');
+        b.className = 'btn btn-ghost'; b.style.cssText = 'display:block;width:100%;margin-bottom:8px'; b.textContent = p.name;
+        b.onclick = async () => {
+          try {
+            const max = await Supa.ptracks.list({ select: 'position', playlist_id: `eq.${p.id}`, order: 'position.desc', limit: 1 });
+            await Supa.ptracks.insert({ playlist_id: p.id, song_id: songId, position: (max[0] ? max[0].position : 0) + 1 });
+            UI.toast(`Ditambahkan ke "${p.name}".`, 'ok');
+            dlg.classList.add('hidden');
+          } catch (e) { UI.toast(e.message.includes('duplicate') ? 'Lagu sudah ada di playlist itu.' : e.message, 'err'); }
+        };
+        list.appendChild(b);
+      });
+      const btns = document.getElementById('dialogBtns');
+      btns.innerHTML = '';
+      const cancel = document.createElement('button'); cancel.className = 'btn btn-ghost'; cancel.textContent = 'Tutup';
+      cancel.onclick = () => dlg.classList.add('hidden');
+      btns.appendChild(cancel);
+      dlg.classList.remove('hidden');
+    }).catch(e => UI.toast(e.message, 'err'));
+  }
+
+  return { login, home, koleksi, playlistIndex, playlistDetail, manajemen, upload, editSong, deleteSong, addSongToPlaylist };
+})();
+
+/* ==== app.js ==== */
+/* ============================================================
+   app.js — router hash, delegasi aksi, mini-player global,
+   profil & logout. Navigasi TIDAK menghentikan musik.
+   ============================================================ */
+const App = (() => {
+  const routes = {
+    '/': Pages.home, '/koleksi': Pages.koleksi, '/playlist': Pages.playlistIndex,
+    '/manajemen': Pages.manajemen, '/upload': Pages.upload, '/login': () => Pages.login('in')
+  };
+
+  function parseHash() {
+    const h = (location.hash || '#/').slice(1) || '/';
+    const parts = h.split('/').filter(Boolean);
+    if (parts[0] === 'playlist' && parts[1]) return { page: 'playlistDetail', id: parts[1] };
+    return { page: '/' + (parts[0] || '') };
+  }
+
+  function setActiveNav(route) {
+    document.querySelectorAll('#mainNav a, #mobileNav a').forEach(a => {
+      a.classList.toggle('active', a.dataset.route === route);
+    });
+  }
+
+  function render() {
+    document.getElementById('mobileNav').classList.add('hidden');
+    const r = parseHash();
+    if (Supa.getSession()) {
+      document.getElementById('navbar').classList.remove('hidden');
+      setActiveNav('/' + r.page.split('/')[1]);
+    } else {
+      document.getElementById('navbar').classList.add('hidden');
+      if (r.page !== '/login') { location.hash = '#/login'; return; }
+    }
+    if (r.page === 'playlistDetail') Pages.playlistDetail(r.id);
+    else if (routes[r.page]) routes[r.page]();
+    else Pages.home();
+    window.scrollTo(0, 0);
+  }
+
+  function rerender() { render(); }
+
+  function boot() {
+    Supa.loadSession();
+    // pastikan token masih hidup sebelum render
+    Supa.refreshIfNearExpiry().then(() => {
+      render();
+      if (!location.hash) location.hash = '#/';
+    });
+  }
+
+  // ---------- EVENT DELEGASI ----------
+  document.addEventListener('click', (e) => {
+    const actEl = e.target.closest('[data-act]');
+    if (actEl) {
+      const card = e.target.closest('[data-id]');
+      const id = card ? card.dataset.id : null;
+      const act = actEl.dataset.act;
+      if (id && act === 'play') {
+        // antrekan seluruh daftar yang tampil agar next/prev mengalir alami
+        const scope = actEl.closest('.song-grid, .song-list');
+        const all = scope ? [...scope.querySelectorAll('[data-id]')].map(c => c.__song).filter(Boolean) : [];
+        const song = currentSongById(id, card);
+        if (all.length > 1) Player.setQueue(all, id);
+        else Player.playSong(song);
+        return;
+      }
+      if (id && act === 'edit') { Pages.editSong(id); return; }
+      if (id && act === 'del') {
+        const inPlaylist = actEl.title === 'Keluar dari playlist';
+        if (inPlaylist) { removeFromPlaylist(id, actEl); return; }
+        Pages.deleteSong(id); return;
+      }
+      if (id && act === 'addpl') { Pages.addSongToPlaylist(id); return; }
+    }
+    // playlist card -> detail
+    const plCard = e.target.closest('.playlist-card');
+    if (plCard && plCard.dataset.id) { location.hash = '#/playlist/' + plCard.dataset.id; return; }
+  });
+
+  async function removeFromPlaylist(trackSongId, btn) {
+    // temukan baris track dari playlist aktif
+    const plId = document.getElementById('page').dataset.plId;
+    if (!plId) return;
+    if (await UI.confirmDialog('Keluarkan lagu ini dari playlist? Lagu tetap ada di koleksi.', 'Keluarkan', false)) {
+      try {
+        const tracks = await Supa.ptracks.list({ select: '*', playlist_id: `eq.${plId}` });
+        const t = tracks.find(x => x.song_id === trackSongId);
+        if (t) await Supa.ptracks.remove(t.id);
+        UI.toast('Lagu dikeluarkan dari playlist.', 'ok');
+        Pages.playlistDetail(plId);
+      } catch (err) { UI.toast(err.message, 'err'); }
+    }
+  }
+
+  // cache lagu untuk tombol play di kartu
+  let songCache = {};
+  document.addEventListener('click', async (e) => { /* diisi oleh cacheCard */ }, true);
+  // isi cache saat halaman memuat daftar
+  const origList = Supa.songs.list;
+  Supa.songs.list = async function (filters = {}) {
+    const rows = await origList.call(Supa.songs, filters);
+    (rows || []).forEach(s => songCache[s.id] = s);
+    return rows;
+  };
+  function currentSongById(id, card) {
+    return (card && card.__song) || songCache[id] || Player.getQueue().find(s => s.id === id) || { id, title: 'Lagu', artist: '' };
+  }
+
+  // ---------- NAVBAR ----------
+  document.getElementById('hamburgerBtn').onclick = () =>
+    document.getElementById('mobileNav').classList.toggle('hidden');
+  document.getElementById('navUploadBtn').onclick = () => location.hash = '#/upload';
+  document.getElementById('profileBtn').onclick = async () => {
+    const u = Supa.getSession()?.user;
+    if (await UI.confirmDialog(`Masuk sebagai ${u?.email || 'pemilik'}.\n\nKeluar dari akun ini?`, 'Keluar', true)) {
+      await Supa.signOut();
+      songCache = {};
+      document.getElementById('player').classList.add('hidden');
+      UI.toast('Anda telah keluar.', 'ok');
+      location.hash = '#/login';
+    }
+  };
+  window.addEventListener('hashchange', render);
+
+  // ---------- MINI PLAYER ----------
+  const $ = id => document.getElementById(id);
+  const audio = Player.audio;
+
+  function syncPlayerUI() {
+    const s = Player.current();
+    const bar = $('player');
+    if (!s) { bar.classList.add('hidden'); return; }
+    bar.classList.remove('hidden');
+    $('playerTitle').textContent = s.title || '—';
+    $('playerArtist').textContent = s.artist || 'Tanpa artis';
+    const cv = UI.coverUrl(s);
+    $('playerCover').innerHTML = cv ? `<img src="${cv}" alt="">` : '♪';
+    $('playBtn').textContent = Player.isPlaying() ? '⏸' : (Player.isLoading() ? '⏳' : '▶');
+    $('shuffleBtn').classList.toggle('active', Player.getShuffle());
+    const rep = Player.getRepeat();
+    $('repeatBtn').textContent = rep === 'one' ? '🔂' : '🔁';
+    $('repeatBtn').classList.toggle('active', rep !== 'off');
+    $('timeTotal').textContent = UI.fmtTime(Player.getDuration() || s.duration_seconds);
+    document.querySelectorAll('.song-card').forEach(c =>
+      c.classList.toggle('playing', c.dataset.id === s.id && Player.isPlaying()));
+    renderQueue();
+  }
+
+  function renderQueue() {
+    const list = $('queueList');
+    const cur = Player.current();
+    list.innerHTML = '';
+    Player.getQueue().forEach((q, i) => {
+      const it = document.createElement('div');
+      it.className = 'q-item' + (cur && q.id === cur.id ? ' current' : '');
+      it.innerHTML = `<span>${i + 1}.</span><div><div class="qi-title">${UI.esc(q.title)}</div><div class="qi-artist">${UI.esc(q.artist || '')}</div></div><span>${UI.fmtTime(q.duration_seconds)}</span>`;
+      it.onclick = () => Player.playSong(q);
+      list.appendChild(it);
+    });
+  }
+
+  function syncTime() {
+    const d = Player.getDuration();
+    const t = Player.getCurrentTime();
+    $('timeNow').textContent = UI.fmtTime(t);
+    $('timeTotal').textContent = UI.fmtTime(d);
+    $('seekBar').value = d ? Math.round(t / d * 1000) : 0;
+    $('playerProgressFill').style.width = (d ? t / d * 100 : 0) + '%';
+  }
+
+  $('playBtn').onclick = () => Player.toggle();
+  $('nextBtn').onclick = () => Player.next(true);
+  $('prevBtn').onclick = () => Player.prev();
+  $('shuffleBtn').onclick = () => { Player.setShuffle(!Player.getShuffle()); syncPlayerUI(); };
+  $('repeatBtn').onclick = () => { Player.cycleRepeat(); syncPlayerUI(); };
+  $('queueBtn').onclick = () => $('queuePanel').classList.toggle('hidden');
+  $('queueClose').onclick = () => $('queuePanel').classList.add('hidden');
+  $('seekBar').oninput = e => {
+    const d = Player.getDuration();
+    if (d) { audio.currentTime = (e.target.value / 1000) * d; }
+  };
+  $('volumeBar').oninput = e => { Player.setVolume(e.target.value / 100); };
+
+  Player.onChange(syncPlayerUI);
+  Player.onTime(syncTime);
+
+  // muat volume tersimpan
+  const v = localStorage.getItem('dmd_vol');
+  if (v !== null) { Player.setVolume(Number(v)); $('volumeBar').value = Math.round(Number(v) * 100); }
+  $('volumeBar').addEventListener('change', () => localStorage.setItem('dmd_vol', audio.volume));
+
+  return { boot, rerender };
+})();
+
+App.boot();
+
+</script>
+</body>
+</html>
