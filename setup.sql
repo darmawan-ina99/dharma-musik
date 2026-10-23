@@ -100,7 +100,7 @@ create policy dharma_pt_owner_all on public.dharma_playlist_tracks
 
 -- ========================= STORAGE BUCKETS =========================
 -- dharma-audio  : PRIVAT  (RLS ketat, streaming via akses terautentikasi)
--- dharma-covers : PUBLIK  (nama file UUID tak terduga, metadata tetap privat di DB)
+-- dharma-covers : PRIVAT  (cover dimuat via sesi terautentikasi + cache; DELETE storage butuh izin SELECT)
 -- dharma-site   : PUBLIK  (hosting file situs)
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values ('dharma-audio', 'dharma-audio', false, 52428800,
@@ -108,7 +108,7 @@ values ('dharma-audio', 'dharma-audio', false, 52428800,
 on conflict (id) do nothing;
 
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-values ('dharma-covers', 'dharma-covers', true, 10485760,
+values ('dharma-covers', 'dharma-covers', false, 10485760,
         array['image/jpeg','image/png','image/webp']::text[])
 on conflict (id) do nothing;
 
@@ -140,6 +140,12 @@ drop policy if exists dharma_covers_owner_write on storage.objects;
 create policy dharma_covers_owner_write on storage.objects
   for insert to authenticated
   with check (bucket_id = 'dharma-covers'
+    and (storage.foldername(name))[1] = (select auth.uid())::text);
+
+drop policy if exists dharma_covers_owner_read on storage.objects;
+create policy dharma_covers_owner_read on storage.objects
+  for select to authenticated
+  using (bucket_id = 'dharma-covers'
     and (storage.foldername(name))[1] = (select auth.uid())::text);
 
 drop policy if exists dharma_covers_owner_delete on storage.objects;
