@@ -12,7 +12,6 @@ function headers(withAuth = true, extra = {}) {
   return h;
 }
 async function refreshIfNearExpiry() {}
-
   // UPLOAD RESUMABLE (protokol TUS Supabase Storage):
   // file dipecah chunk 5MB; jika koneksi putus di tengah jalan, uploader
   // menunggu sebentar, membaca posisi terakhir dari server, lalu MELANJUTKAN
@@ -28,6 +27,61 @@ async function refreshIfNearExpiry() {}
     return parseInt(r.headers.get('Upload-Offset') || '0', 10);
   }
 
+  async function upload(bucket, path, file, onProgress) {
+    await refreshIfNearExpiry();
+    const meta = `bucketName ${b64s(bucket)},objectName ${b64s(path)},contentType ${b64s(file.type || 'application/octet-stream')},cacheControl ${b64s('3600')}`;
+    // 1) buat sesi upload resumable
+    const c = await fetch(`${TUS_HOST}/storage/v1/upload/resumable`, {
+      method: 'POST',
+      headers: headers(true, { 'tus-resumable': '1.0.0', 'Upload-Length': String(file.size), 'Upload-Metadata': meta })
+    });
+    if (!c.ok) {
+      let m = 'Upload gagal (' + c.status + ')';
+      try { m = (await c.json()).message || m; } catch (e) {}
+      throw new Error(m);
+    }
+    const up = c.headers.get('Location');
+    if (!up) throw new Error('Server tidak memberi tautan upload.');
+    // 2) kirim chunk demi chunk dengan retry + lanjut-otomatis
+    let offset = 0, retries = 0;
+    while (offset < file.size) {
+      if (onProgress) onProgress(Math.round(offset / file.size * 100));
+      const end = Math.min(offset + TUS_CHUNK, file.size);
+      let advanced = false;
+      try {
+        await refreshIfNearExpiry();
+        const r = await fetch(up, {
+          method: 'PATCH',
+          headers: headers(true, { 'tus-resumable': '1.0.0', 'Upload-Offset': String(offset), 'Content-Type': 'application/offset+octet-stream' }),
+          body: file.slice(offset, end)
+        });
+        if (r.ok) {
+          offset = parseInt(r.headers.get('Upload-Offset') || String(end), 10);
+          advanced = true; retries = 0;
+        } else if (r.status === 409 || r.status === 460 || r.status === 400) {
+          // offset basi (mis. chunk tadi ternyata sampai) — selaraskan dari server
+          offset = await tusOffset(up); advanced = offset >= end;
+          if (!advanced) throw new Error('Konflik posisi upload (' + r.status + ').');
+        } else {
+          let m = 'Upload gagal (' + r.status + ')';
+          try { m = (await r.json()).message || m; } catch (e) {}
+          throw new Error(m);
+        }
+      } catch (e) {
+        if (String(e.message).indexOf('Upload gagal') === 0) throw e; // kesalahan server: jangan diulang
+        retries++;
+        if (retries > 12) throw new Error('Koneksi terlalu sering terputus. Coba lagi; progres Anda aman dan akan dilanjutkan.');
+        const tunda = Math.min(1000 * retries, 12000);
+        await new Promise(res => setTimeout(res, tunda));
+        try { offset = await tusOffset(up); } catch (e2) { /* server belum terjangkau; ulangi tunda */ }
+      }
+      if (!advanced && retries > 12) throw new Error('Upload tidak dapat dilanjutkan setelah beberapa kali mencoba.');
+    }
+    if (onProgress) onProgress(100);
+    return { Key: `${bucket}/${path}`, path };
+  }
+
+
 async function main() {
   const lr = await fetch(CONFIG.url + '/auth/v1/token?grant_type=password', {
     method: 'POST', headers: { 'apikey': CONFIG.anonKey, 'Content-Type': 'application/json' },
@@ -36,14 +90,10 @@ async function main() {
   session = await lr.json(); const uid = session.user.id;
   log('login OK, uid:', uid);
   const mkfile = (size, val) => { const b = new Uint8Array(size); for (let i=0;i<size;i+=4096) b[i]=val; return new File([b], 'uji.wav', { type: 'audio/wav' }); };
-
-  // TES 1: normal 6MB
   try {
     const r = await upload('dharma-audio', uid + '/tes1.wav', mkfile(6*1024*1024, 65), p => log('  tes1 progres:', p + '%'));
     log('TES1 UPLOAD 6MB: OK');
   } catch (e) { log('TES1 GAGAL:', e.message); }
-
-  // TES 2: putus jaringan dipaksa pada chunk ke-2, dua kali
   const fetchAsli = window.fetch; let patchCount = 0;
   window.fetch = function(url, opts) {
     if (opts && opts.method === 'PATCH' && String(url).indexOf('upload/resumable/') > 0) {
@@ -58,8 +108,6 @@ async function main() {
     log('TES2 RESUME SETELAH PUTUS x2: OK dalam ' + ((Date.now()-t0)/1000).toFixed(1) + 's (patch total: ' + patchCount + ')');
   } catch (e) { log('TES2 GAGAL:', e.message); }
   window.fetch = fetchAsli;
-
-  // bersih-bersih
   for (const f of ['tes1.wav','tes2.wav','proto.wav','proto2.wav','102400.wav','3145728.wav','10485760.wav']) {
     try { await fetchAsli(CONFIG.url + '/storage/v1/object/dharma-audio/' + uid + '/' + f, { method: 'DELETE', headers: headers() }); } catch (e) {}
   }
