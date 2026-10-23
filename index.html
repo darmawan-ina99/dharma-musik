@@ -631,8 +631,20 @@ const UI = (() => {
   function esc(s) {
     return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   }
-  function coverUrl(song) {
-    return song.cover_path ? Supa.publicUrl('dharma-covers', song.cover_path) : null;
+  // COVER PRIVAT: dimuat via sesi terautentikasi (blob) + cache sesi
+  const coverCache = new Map(); // path -> objectURL
+  function coverUrl(song) { return song.cover_path || null; } // path objek, bukan URL publik
+  async function loadCover(path) {
+    if (coverCache.has(path)) return coverCache.get(path);
+    const blob = await Supa.download('dharma-covers', path);
+    const u = URL.createObjectURL(blob);
+    if (coverCache.size > 60) { const k = coverCache.keys().next().value; URL.revokeObjectURL(coverCache.get(k)); coverCache.delete(k); }
+    coverCache.set(path, u);
+    return u;
+  }
+  function hydrateCoverImg(img, path) {
+    if (!img || !path) return;
+    loadCover(path).then(u => { img.src = u; }).catch(() => { img.remove(); });
   }
 
   function songCard(song, opts = {}) {
@@ -641,9 +653,10 @@ const UI = (() => {
     el.dataset.id = song.id;
     el.__song = song; // ikatan langsung untuk aksi play (tanpa lookup rapuh)
     const cv = coverUrl(song);
+    if (cv) hydrateCoverImg(el.querySelector('.song-cover img'), cv);
     el.innerHTML = `
       <div class="song-cover" data-act="play">
-        ${cv ? `<img src="${esc(cv)}" alt="cover ${esc(song.title)}" loading="lazy">` : ''}
+        ${cv ? `<img alt="cover ${esc(song.title)}" loading="lazy">` : ''}
         <div class="play-overlay">▶</div>
         <div class="playing-badge"> Diputar</div>
       </div>
@@ -685,11 +698,12 @@ const UI = (() => {
     const el = document.createElement('div');
     el.className = 'playlist-card';
     el.dataset.id = pl.id;
-    const cv = pl.cover_path ? Supa.publicUrl('dharma-covers', pl.cover_path) : null;
+    const cv = pl.cover_path || null;
     el.innerHTML = `
-      <div class="icon">${cv ? `<img src="${esc(cv)}" style="-webkit-background-clip:0;width:100%;border-radius:12px" alt="">` : '🎵'}</div>
+      <div class="icon">${cv ? `<img style="-webkit-background-clip:0;width:100%;border-radius:12px" alt="">` : '🎵'}</div>
       <h3>${esc(pl.name)}</h3>
       <div class="count">${count} lagu · dibuat ${fmtDate(pl.created_at)}</div>`;
+    if (cv) hydrateCoverImg(el.querySelector('.playlist-card .icon img'), cv);
     return el;
   }
 
@@ -713,7 +727,7 @@ const UI = (() => {
     return el;
   }
 
-  return { toast, confirmDialog, fmtTime, fmtDate, esc, coverUrl, songCard, songRow, playlistCard, skeletonGrid, empty };
+  return { toast, confirmDialog, fmtTime, fmtDate, esc, coverUrl, hydrateCoverImg, loadCover, songCard, songRow, playlistCard, skeletonGrid, empty };
 })();
 
 /* ==== pages.js ==== */
@@ -1115,7 +1129,7 @@ const Pages = (() => {
       const cv = UI.coverUrl(song);
       document.getElementById('dialogMsg').innerHTML = `
         <strong>Edit Lagu</strong>
-        ${cv ? `<img src="${esc_(cv)}" style="width:70px;height:70px;border-radius:10px;margin:10px 0" alt="">` : ''}
+        ${cv ? `<img style="width:70px;height:70px;border-radius:10px;margin:10px 0" alt="cover">` : ''}
         <div class="field" style="margin-top:10px"><label>Judul</label><input id="edTitle" value="${esc_(song.title)}"></div>
         <div class="field"><label>Artis</label><input id="edArtist" value="${esc_(song.artist || '')}"></div>
         <div class="field"><label>Album</label><input id="edAlbum" value="${esc_(song.album || '')}"></div>
@@ -1125,6 +1139,7 @@ const Pages = (() => {
         <div class="field"><label>Deskripsi</label><textarea id="edDesc" rows="2">${esc_(song.description || '')}</textarea></div>
         <div class="field"><label>Lirik</label><textarea id="edLyrics" rows="4">${esc_(song.lyrics || '')}</textarea></div>
         <div class="field"><label>Ganti cover (JPG/PNG/WebP)</label><input id="edCover" type="file" accept="image/jpeg,image/png,image/webp"></div>`;
+      if (cv) UI.hydrateCoverImg(document.querySelector('#dialogMsg img'), cv);
       const btns = document.getElementById('dialogBtns');
       btns.innerHTML = '';
       const cancel = document.createElement('button'); cancel.className = 'btn btn-ghost'; cancel.textContent = 'Batal';
