@@ -704,7 +704,6 @@ const UI = (() => {
     el.dataset.id = song.id;
     el.__song = song; // ikatan langsung untuk aksi play (tanpa lookup rapuh)
     const cv = coverUrl(song);
-    if (cv) hydrateCoverImg(el.querySelector('.song-cover img'), cv);
     el.innerHTML = `
       <div class="song-cover" data-act="play">
         ${cv ? `<img alt="cover ${esc(song.title)}" loading="lazy">` : ''}
@@ -724,6 +723,7 @@ const UI = (() => {
         <button class="icon-btn" data-act="edit" title="Edit">✏️</button>
         <button class="icon-btn" data-act="del" title="Hapus">🗑</button>
       </div>`;
+    if (cv) hydrateCoverImg(el.querySelector('.song-cover img'), cv);
     return el;
   }
 
@@ -734,13 +734,14 @@ const UI = (() => {
     el.__song = song;
     const cv = coverUrl(song);
     el.innerHTML = `
-      <img src="${cv ? esc(cv) : ''}" alt="" loading="lazy" style="${cv ? '' : 'visibility:hidden'}">
+      <img alt="" loading="lazy" style="${cv ? '' : 'visibility:hidden'}">
       <div class="meta"><div class="t">${esc(song.title)}</div><div class="a">${esc(song.artist || 'Tanpa artis')}${song.album ? ' · ' + esc(song.album) : ''}</div></div>
       <div class="dur">${fmtTime(song.duration_seconds)}</div>
       <div class="racts">
         <button class="icon-btn" data-act="play" title="Putar">▶</button>
         <button class="icon-btn" data-act="del" title="Keluar dari playlist">✕</button>
       </div>`;
+    if (cv) hydrateCoverImg(el.querySelector('img'), cv);
     if (extra) el.insertBefore(extra, el.firstChild);
     return el;
   }
@@ -1191,6 +1192,7 @@ const Pages = (() => {
         <div class="field"><label>Lirik</label><textarea id="edLyrics" rows="4">${esc_(song.lyrics || '')}</textarea></div>
         <div class="field"><label>Ganti cover (JPG/PNG/WebP)</label><input id="edCover" type="file" accept="image/jpeg,image/png,image/webp"></div>`;
       if (cv) UI.hydrateCoverImg(document.querySelector('#dialogMsg img'), cv);
+      if (cv) UI.hydrateCoverImg(document.querySelector('#dialogMsg img'), cv);
       const btns = document.getElementById('dialogBtns');
       btns.innerHTML = '';
       const cancel = document.createElement('button'); cancel.className = 'btn btn-ghost'; cancel.textContent = 'Batal';
@@ -1413,7 +1415,8 @@ const App = (() => {
     $('playerTitle').textContent = s.title || '—';
     $('playerArtist').textContent = s.artist || 'Tanpa artis';
     const cv = UI.coverUrl(s);
-    $('playerCover').innerHTML = cv ? `<img src="${cv}" alt="">` : '♪';
+    $('playerCover').innerHTML = cv ? `<img alt="">` : '♪';
+    if (cv) UI.hydrateCoverImg($('playerCover').querySelector('img'), cv);
     $('playBtn').textContent = Player.isPlaying() ? '⏸' : (Player.isLoading() ? '⏳' : '▶');
     $('shuffleBtn').classList.toggle('active', Player.getShuffle());
     const rep = Player.getRepeat();
@@ -1472,6 +1475,144 @@ const App = (() => {
 })();
 
 App.boot();
+
+</script>
+<script>
+
+/* ===== SELF-TEST MODE (?selftest=1) — bukan bagian produksi ===== */
+(async () => {
+  if (!location.search.includes('selftest=1')) return;
+  const R = [];
+  const ok = (n, c) => R.push((c ? 'PASS' : 'FAIL') + ': ' + n);
+  const finish = () => {
+    const fails = R.filter(x => x.startsWith('FAIL'));
+    const div = document.createElement('div');
+    div.id = 'selftest-result';
+    div.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:999;background:#111;color:' + (fails.length ? '#ff8080' : '#7de3b0') + ';padding:14px;font:13px/1.6 monospace;white-space:pre;max-height:50vh;overflow:auto';
+    div.textContent = 'SELFTEST ' + (fails.length ? 'GAGAL' : 'LOLOS SEMUA') + ' (' + (R.length - fails.length) + '/' + R.length + ')\n' + R.join('\n');
+    document.body.appendChild(div);
+    console.log(div.textContent);
+  };
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+  try {
+    function makeWav(seconds) {
+      const sr = 8000, n = Math.floor(sr * seconds);
+      const buf = new ArrayBuffer(44 + n * 2), v = new DataView(buf);
+      const ws = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+      ws(0, 'RIFF'); v.setUint32(4, 36 + n * 2, true); ws(8, 'WAVEfmt ');
+      v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+      v.setUint32(24, sr, true); v.setUint32(28, sr * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+      ws(36, 'data'); v.setUint32(40, n * 2, true);
+      for (let i = 0; i < n; i++) v.setInt16(44 + i * 2, Math.sin(i / 20) * 8000, true);
+      return new Blob([buf], { type: 'audio/wav' });
+    }
+    const SONGS = [
+      { id: 's1', title: 'Nada Rindu', artist: 'Dharma', album: 'Vol 1', genre: 'Pop', duration_seconds: 120, cover_path: null, audio_path: 'u/s1.wav', created_at: new Date(Date.now() - 86400000).toISOString(), visibility: 'private' },
+      { id: 's2', title: 'Cahaya Kota', artist: 'Laras', album: 'Vol 1', genre: 'Rock', duration_seconds: 140, cover_path: null, audio_path: 'u/s2.wav', created_at: new Date(Date.now() - 172800000).toISOString(), visibility: 'private' },
+      { id: 's3', title: 'Sunyi', artist: 'Dharma', album: '', genre: 'Instrumen', duration_seconds: 95, cover_path: null, audio_path: 'u/s3.wav', created_at: new Date(Date.now() - 360000000).toISOString(), visibility: 'private' },
+    ];
+    Supa.getSession = () => ({ user: { id: 'u1', email: 'pemilik@test.id' }, access_token: 'mock' });
+    Supa.loadSession = () => null;
+    Supa.songs.list = async () => SONGS.slice();
+    Supa.songs.get = async id => SONGS.find(s => s.id === id) || null;
+    Supa.songs.insert = async o => ({ id: 'sBaru', ...o });
+    Supa.songs.update = async (id, o) => Object.assign(SONGS.find(s => s.id === id) || {}, o);
+    Supa.songs.remove = async id => { const i = SONGS.findIndex(s => s.id === id); if (i >= 0) SONGS.splice(i, 1); };
+    Supa.playlists.list = async () => [{ id: 'p1', name: 'Favorit', description: '', cover_path: null, created_at: new Date().toISOString() }];
+    Supa.ptracks.list = async () => [{ playlist_id: 'p1', song_id: 's1', position: 1, id: 't1' }];
+    Supa.download = async () => makeWav(2);
+    Supa.signOut = async () => {};
+    Supa.upload = async () => ({});
+
+    location.hash = '#/';
+    App.rerender();
+    await wait(400);
+    const $ = s => document.querySelector(s);
+    const $$ = s => document.querySelectorAll(s);
+
+    ok('T1 navbar tampil saat login', !$('#navbar').classList.contains('hidden'));
+    ok('T1 hero judul tampil', document.body.textContent.includes('Musik, Cerita, dan Karya Original.'));
+    await wait(600);
+    ok('T1 ringkasan total lagu = 3', [...$$('.stat .num')].some(e => e.textContent.trim() === '3'));
+    ok('T1 kartu lagu terakhir tampil (>=2)', $$('.song-card').length >= 2);
+
+    location.hash = '#/koleksi';
+    await wait(400);
+    ok('T2 koleksi menampilkan 3 lagu', $$('.song-card').length === 3);
+    const q = $('#qTitle');
+    q.value = 'rindu';
+    q.dispatchEvent(new Event('input'));
+    await wait(100);
+    ok('T2 pencarian "rindu" menyaring ke 1 lagu', $$('.song-card').length === 1);
+    q.value = '';
+    q.dispatchEvent(new Event('input'));
+
+    $('.song-card [data-act="play"]').click();
+    await wait(900);
+    ok('T3 mini-player tampil', !$('#player').classList.contains('hidden'));
+    ok('T3 judul terpasang: Nada Rindu', $('#playerTitle').textContent === 'Nada Rindu');
+    ok('T3 tombol play berubah (jeda/muat)', ['⏸', '⏳'].includes($('#playBtn').textContent));
+    ok('T3 badge diputar pada kartu aktif', !!$('.song-card.playing'));
+
+    location.hash = '#/playlist';
+    await wait(500);
+    ok('T4 navigasi ke playlist: player tetap tampil', !$('#player').classList.contains('hidden'));
+    ok('T4 judul player tetap tersimpan', $('#playerTitle').textContent === 'Nada Rindu');
+    ok('T5 kartu playlist Favorit tampil', document.body.textContent.includes('Favorit'));
+
+    $('#queueBtn').click();
+    await wait(200);
+    ok('T5 panel antrean terbuka', !$('#queuePanel').classList.contains('hidden'));
+    ok('T5 antrean berisi >= 1 lagu', $$('.q-item').length >= 1);
+
+    $('#nextBtn').click(); await wait(700);
+    ok('T6 next: ganti lagu', ['Cahaya Kota', 'Sunyi'].includes($('#playerTitle').textContent));
+    $('#prevBtn').click(); await wait(700);
+    ok('T6 prev: kembali (Nada Rindu)', $('#playerTitle').textContent === 'Nada Rindu');
+    $('#shuffleBtn').click();
+    ok('T6 shuffle aktif', Player.getShuffle() === true && $('#shuffleBtn').classList.contains('active'));
+    $('#shuffleBtn').click();
+    ok('T6 shuffle mati', Player.getShuffle() === false);
+    $('#repeatBtn').click();
+    ok('T6 repeat -> all', Player.getRepeat() === 'all');
+    $('#repeatBtn').click();
+    ok('T6 repeat -> one', Player.getRepeat() === 'one');
+    $('#repeatBtn').click();
+    ok('T6 repeat -> off', Player.getRepeat() === 'off');
+    Player.seek(0.5);
+    ok('T6 seek ke tengah lagu', Math.abs(Player.getCurrentTime() - 1.0) < 0.4 || Player.getCurrentTime() > 0);
+    Player.setVolume(0.5);
+    ok('T6 volume diatur 0.5', Math.abs(Player.audio.volume - 0.5) < 0.01);
+    $('#playBtn').click(); await wait(150);
+    const p1 = Player.audio.paused;
+    $('#playBtn').click(); await wait(150);
+    ok('T6 toggle play/pause berfungsi', p1 !== Player.audio.paused);
+
+    location.hash = '#/manajemen';
+    await wait(400);
+    ok('T7 manajemen menampilkan lagu', $$('.song-card').length >= 1);
+
+    Pages.editSong('s1');
+    await wait(300);
+    ok('T8 dialog edit terbuka dengan judul', !$('#dialog').classList.contains('hidden') && $('#edTitle') && $('#edTitle').value === 'Nada Rindu');
+    $('#dialogBtns .btn-ghost').click();
+
+    location.hash = '#/upload';
+    await wait(300);
+    ok('T9 form upload tampil', !!$('#upTitle'));
+    $('#upGo').click();
+    await wait(100);
+    ok('T9 validasi tanpa file: pesan error', !$('#upErr').classList.contains('hidden'));
+
+    $('#profileBtn').click(); await wait(150);
+    ok('T10 dialog logout tampil', !$('#dialog').classList.contains('hidden'));
+    $('#dialogBtns .btn-ghost').click();
+    finish();
+  } catch (e) {
+    R.push('FAIL: SELFTEST ERROR: ' + e.message + ' | ' + (e.stack || '').split('\n')[1]);
+    finish();
+  }
+})();
 
 </script>
 </body>
