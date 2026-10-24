@@ -215,6 +215,221 @@ img{display:block}
 }
 
 </style>
+<style>
+/* ============================================================
+   auth.css — pengalaman autentikasi interaktif Dharma-Labs:
+   maskot "Dhiro", kartu login/daftar/lupa sandi, micro-interactions.
+   Seluruh animasi menghormati prefers-reduced-motion.
+   ============================================================ */
+
+/* ---------- panggung & latar ---------- */
+.authx-wrap {
+  min-height: 100svh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 6px; padding: 26px 16px 42px; box-sizing: border-box;
+  background:
+    radial-gradient(640px 420px at 18% -8%, rgba(62, 223, 216, .13), transparent 62%),
+    radial-gradient(560px 400px at 86% 108%, rgba(255, 99, 195, .11), transparent 60%),
+    var(--bg, #0c0c0e);
+}
+.authx-stage { display: flex; justify-content: center; }
+.authx-card {
+  width: 100%; max-width: 420px;
+  background: rgba(22, 22, 28, .92);
+  border: 1px solid rgba(255, 255, 255, .08);
+  border-radius: 22px; padding: 26px 24px 24px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, .55), inset 0 1px 0 rgba(255, 255, 255, .05);
+  animation: authx-in .5s cubic-bezier(.2, .8, .25, 1) both;
+}
+@keyframes authx-in { from { opacity: 0; transform: translateY(14px) scale(.985); } to { opacity: 1; } }
+
+.authx-head { text-align: center; margin-bottom: 16px; }
+.authx-head img { width: 52px; height: 52px; border-radius: 14px; box-shadow: 0 6px 22px rgba(62, 223, 216, .25); }
+.authx-head h1 { margin: 10px 0 2px; font-size: 21px; letter-spacing: .3px; color: #fff; }
+.authx-head p { margin: 0; font-size: 13px; color: #9aa0ab; }
+
+/* ---------- tab Masuk/Daftar ---------- */
+.authx-tabs {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 4px;
+  background: #101014; border: 1px solid #23232b; border-radius: 12px; padding: 4px; margin-bottom: 18px;
+}
+.authx-tabs button {
+  appearance: none; border: 0; background: transparent; color: #9aa0ab;
+  font: inherit; font-size: 14px; padding: 9px 6px; border-radius: 9px; cursor: pointer;
+  transition: color .2s, background .2s;
+}
+.authx-tabs button[aria-selected="true"] { background: linear-gradient(120deg, rgba(62,223,216,.18), rgba(255,99,195,.18)); color: #fff; }
+.authx-tabs button:focus-visible { outline: 2px solid #3edfd8; outline-offset: 2px; }
+
+/* ---------- field ---------- */
+.authx-field { margin-bottom: 13px; }
+.authx-field label { display: block; font-size: 13px; color: #c7ccd4; margin-bottom: 6px; }
+.authx-input { position: relative; display: flex; align-items: center; }
+.authx-input input {
+  width: 100%; box-sizing: border-box;
+  background: #101014; border: 1px solid #26262e; border-radius: 12px;
+  color: #f2f4f7; font: inherit; font-size: 15px; padding: 12px 14px;
+  transition: border-color .2s, box-shadow .2s;
+}
+.authx-input input::placeholder { color: #565b66; }
+.authx-input input:focus { outline: none; border-color: #3edfd8; box-shadow: 0 0 0 3px rgba(62, 223, 216, .18); }
+.authx-input input:focus-visible { outline: none; }
+.authx-input.invalid input { border-color: #ff6470; box-shadow: 0 0 0 3px rgba(255, 100, 112, .16); }
+.authx-input .peek-btn {
+  position: absolute; right: 6px; appearance: none; border: 0; background: transparent;
+  color: #9aa0ab; padding: 8px 10px; border-radius: 8px; cursor: pointer; font-size: 15px; line-height: 1;
+}
+.authx-input .peek-btn:hover { color: #fff; background: rgba(255, 255, 255, .06); }
+.authx-input .peek-btn:focus-visible { outline: 2px solid #3edfd8; outline-offset: 1px; }
+
+.authx-hint { font-size: 11.5px; color: #788092; margin: 6px 2px 0; }
+.authx-err-field { font-size: 12px; color: #ff8b95; margin: 5px 2px 0; min-height: 0; }
+
+/* ---------- meter kekuatan sandi ---------- */
+.authx-meter { display: flex; gap: 5px; margin-top: 8px; }
+.authx-meter i { flex: 1; height: 5px; border-radius: 4px; background: #23232b; transition: background .25s; }
+.authx-meter i.on-1 { background: #ff6470; } .authx-meter i.on-2 { background: #ffb35c; }
+.authx-meter i.on-3 { background: #7ee08a; } .authx-meter i.on-4 { background: #3edfd8; }
+.authx-meter-label { font-size: 11.5px; color: #788092; margin-top: 5px; }
+
+/* ---------- baris opsi (ingat sesi, persetujuan) ---------- */
+.authx-row { display: flex; align-items: flex-start; gap: 9px; margin: 2px 2px 12px; font-size: 13px; color: #c7ccd4; }
+.authx-row.check { align-items: center; }
+.authx-row input[type="checkbox"] { width: 17px; height: 17px; accent-color: #3edfd8; flex: none; cursor: pointer; }
+.authx-row a { color: #3edfd8; text-decoration: none; cursor: pointer; }
+.authx-row a:hover { text-decoration: underline; }
+.authx-row input[type="checkbox"]:focus-visible { outline: 2px solid #3edfd8; outline-offset: 2px; }
+
+/* ---------- pesan & tombol ---------- */
+.authx-msg {
+  border-radius: 12px; padding: 11px 13px; font-size: 13.5px; margin-bottom: 13px;
+  border: 1px solid transparent; display: none;
+}
+.authx-msg.show { display: block; animation: authx-in .3s both; }
+.authx-msg.err { background: rgba(255, 100, 112, .1); border-color: rgba(255, 100, 112, .35); color: #ffb1b8; }
+.authx-msg.ok { background: rgba(62, 223, 216, .08); border-color: rgba(62, 223, 216, .35); color: #9df3ee; }
+
+.authx-btn {
+  width: 100%; appearance: none; border: 0; cursor: pointer;
+  font: inherit; font-size: 15px; font-weight: 600; color: #06121a;
+  padding: 13px 14px; border-radius: 13px;
+  background: linear-gradient(120deg, #3edfd8, #7cc4ff 55%, #ff63c3);
+  transition: transform .15s, box-shadow .2s, filter .2s;
+  box-shadow: 0 10px 26px rgba(62, 223, 216, .22);
+  display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+}
+.authx-btn:hover { filter: brightness(1.06); transform: translateY(-1px); }
+.authx-btn:active { transform: translateY(0) scale(.99); }
+.authx-btn:disabled { cursor: not-allowed; filter: grayscale(.5) brightness(.75); box-shadow: none; }
+.authx-btn:focus-visible { outline: 3px solid rgba(62, 223, 216, .55); outline-offset: 2px; }
+.authx-btn.ok { background: linear-gradient(120deg, #57e89b, #3edfd8); }
+.authx-btn.fail { background: linear-gradient(120deg, #ff6470, #ff9a62); color: #2a0a0e; }
+.authx-spin {
+  width: 16px; height: 16px; flex: none; border-radius: 50%;
+  border: 2.5px solid rgba(6, 18, 26, .25); border-top-color: #06121a;
+  animation: authx-rot .7s linear infinite;
+}
+@keyframes authx-rot { to { transform: rotate(360deg); } }
+
+.authx-links { text-align: center; margin-top: 15px; font-size: 13.5px; color: #9aa0ab; }
+.authx-links a { color: #3edfd8; text-decoration: none; cursor: pointer; font-weight: 600; }
+.authx-links a:hover { text-decoration: underline; }
+.authx-links a:focus-visible, .authx-switch:focus-visible { outline: 2px solid #3edfd8; outline-offset: 2px; border-radius: 4px; }
+.authx-switch { color: #ff63c3; }
+
+/* ---------- panel transisi ---------- */
+.authx-panel { display: none; }
+.authx-panel.active { display: block; animation: authx-in .35s both; }
+
+/* ============================================================
+   MASKOT "DHIRO" — SVG murni, animasi CSS berbasis data-mood.
+   Pupils mengikuti variabel --lx/--ly (arah pandang), tidak
+   pernah membaca nilai input.
+   ============================================================ */
+.mascot { width: 168px; height: 148px; margin: 0 auto 8px; user-select: none; pointer-events: none; }
+.mascot svg { width: 100%; height: 100%; overflow: visible; }
+.m-float { animation: m-bob 4.2s ease-in-out infinite; transform-origin: 110px 100px; }
+@keyframes m-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+
+.m-shadow { fill: rgba(0, 0, 0, .42); }
+
+.m-antenna { stroke: #8b93a5; stroke-width: 3; stroke-linecap: round; }
+.m-antenna-tip { fill: #3edfd8; animation: m-tip 2.6s ease-in-out infinite; }
+@keyframes m-tip { 0%, 100% { fill: #3edfd8; } 50% { fill: #ff63c3; } }
+
+.m-body { fill: url(#mGrad); stroke: rgba(255, 255, 255, .14); stroke-width: 1.5; }
+.m-face { fill: #0b0d12; stroke: rgba(255, 255, 255, .06); }
+.m-ear { fill: #23262f; }
+
+.m-arm { fill: url(#mGrad); stroke: rgba(255, 255, 255, .14); stroke-width: 1.5; }
+.m-arm-l { transform-origin: 44px 90px; }
+.m-arm-r { transform-origin: 176px 90px; }
+.m-arm-l, .m-arm-r { transition: transform .55s cubic-bezier(.5, -0.3, .3, 1.35); }
+
+.m-eyeball { fill: #f4f7fa; transform-box: fill-box; transform-origin: center; animation: m-blink 4.6s infinite; }
+@keyframes m-blink { 0%, 93%, 100% { transform: scaleY(1); } 96% { transform: scaleY(.08); } }
+.m-pupil { fill: #0c0f16; transform: translate(var(--lx, 0px), var(--ly, 3px)); transition: transform .28s ease; }
+
+.m-cheek { fill: rgba(255, 99, 195, .4); }
+
+.m-mouth { fill: none; stroke: #9aa7bd; stroke-width: 3.2; stroke-linecap: round; transition: opacity .25s; }
+.m-mouth-smile, .m-mouth-frown { fill: none; stroke-width: 3.4; stroke-linecap: round; opacity: 0; transition: opacity .25s; }
+.m-mouth-smile { stroke: #7ee08a; }
+.m-mouth-frown { stroke: #ff8b95; }
+
+.m-happy { fill: none; stroke: #f4f7fa; stroke-width: 3.4; stroke-linecap: round; opacity: 0; transition: opacity .25s; }
+
+.m-spins { opacity: 0; transition: opacity .25s; }
+.m-spins circle { fill: none; stroke: #3edfd8; stroke-width: 3; stroke-linecap: round; stroke-dasharray: 46 120; transform-box: fill-box; transform-origin: center; }
+.m-spins .sp2 { stroke: #ff63c3; transform: rotate(180deg); }
+.m-spin-g { animation: m-rot 1s linear infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes m-rot { to { transform: rotate(360deg); } }
+
+/* ---------- suasana (mood) ---------- */
+.mascot[data-mood="covering"] .m-arm-l { transform: rotate(142deg); }
+.mascot[data-mood="covering"] .m-arm-r { transform: rotate(-142deg); }
+
+.mascot[data-mood="loading"] .m-eyes { opacity: 0; }
+.mascot[data-mood="loading"] .m-spins { opacity: 1; }
+.mascot[data-mood="loading"] .m-float { animation: m-pulse 1s ease-in-out infinite; }
+@keyframes m-pulse { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-2px) scale(1.02); } }
+
+.mascot[data-mood="success"] .m-eyeball, .mascot[data-mood="success"] .m-pupil { opacity: 0; }
+.mascot[data-mood="success"] .m-happy { opacity: 1; }
+.mascot[data-mood="success"] .m-mouth { opacity: 0; }
+.mascot[data-mood="success"] .m-mouth-smile { opacity: 1; }
+.mascot[data-mood="success"] .m-float { animation: m-cheer .6s cubic-bezier(.2, .8, .3, 1.3) 2; }
+@keyframes m-cheer { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-11px); } }
+
+.mascot[data-mood="fail"] .m-mouth { opacity: 0; }
+.mascot[data-mood="fail"] .m-mouth-frown { opacity: 1; }
+.mascot[data-mood="fail"] .m-float { animation: m-shake .5s ease-in-out 1; }
+@keyframes m-shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-6px); } 45% { transform: translateX(6px); } 70% { transform: translateX(-4px); } }
+
+.mascot[data-mood="peek"] .m-arm-l { transform: rotate(38deg); }
+.mascot[data-mood="peek"] .m-arm-r { transform: rotate(-38deg); }
+.mascot[data-mood="peek"] .m-pupil { transform: translate(-6px, -4px); }
+.mascot[data-mood="peek"] .m-eyeball { animation: none; }
+
+/* ---------- responsif ---------- */
+@media (max-width: 560px) {
+  .authx-wrap { padding: 18px 12px 34px; }
+  .mascot { width: 122px; height: 108px; margin-bottom: 4px; }
+  .authx-card { padding: 20px 16px 18px; border-radius: 18px; }
+  .authx-head img { width: 44px; height: 44px; }
+  .authx-head h1 { font-size: 18px; }
+}
+/* ---------- aksesibilitas: kurangi gerakan ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .authx-card, .authx-msg, .authx-panel.active { animation: none; }
+  .m-float, .m-eyeball, .m-antenna-tip, .m-spin-g { animation: none !important; }
+  .mascot[data-mood="loading"] .m-float,
+  .mascot[data-mood="success"] .m-float,
+  .mascot[data-mood="fail"] .m-float { animation: none !important; }
+  .m-arm-l, .m-arm-r, .m-pupil, .authx-btn, .authx-tabs button { transition: none; }
+}
+
+</style>
 </head>
 <body>
 <div id="app">
@@ -317,10 +532,10 @@ const Supa = (() => {
   }
 
   // ---------- AUTH ----------
-  async function signUp(email, password) {
+  async function signUp(email, password, fullName) {
     const r = await fetch(`${CONFIG.url}/auth/v1/signup`, {
       method: 'POST', headers: headers(false, { 'Content-Type': 'application/json' }),
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ email, password, data: { full_name: fullName || '' } })
     });
     const j = await r.json();
     if (!r.ok) throw new Error(msgAuth(j));
@@ -343,16 +558,50 @@ const Supa = (() => {
     const e = j.msg || j.error_description || j.error || 'Gagal masuk';
     if (/invalid login credentials/i.test(e)) return 'Email atau kata sandi salah.';
     if (/already registered/i.test(e)) return 'Email sudah terdaftar. Silakan masuk.';
-    return e;
+    if (/too many|rate.?limit|over.?request/i.test(e)) return 'Terlalu banyak percobaan. Tunggu sebentar, lalu coba lagi.';
+    if (/password should be at least/i.test(e)) return 'Kata sandi minimal 6 karakter.';
+    if (/email not confirmed/i.test(e)) return 'Email belum diverifikasi. Periksa kotak masuk Anda.';
+    return 'Terjadi kesalahan. Periksa kembali isian Anda.';
+  }
+
+  // pemulihan sandi resmi Supabase; respons 200 juga untuk email tak dikenal
+  // (anti-enumeration), jadi tidak membocorkan keberadaan akun.
+  async function recover(email) {
+    const r = await fetch(`${CONFIG.url}/auth/v1/recover`, {
+      method: 'POST', headers: headers(false, { 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ email, redirect_to: location.origin + '/#/login' })
+    });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(msgAuth(j || {}));
+    return j;
+  }
+
+  // "Ingat sesi": dipercaya -> localStorage, tidak -> sessionStorage (hilang saat tab tertutup)
+  let rememberMe = true;
+  function setRemember(v) {
+    rememberMe = !!v;
+    try {
+      const cur = localStorage.getItem('dmd_session');
+      if (cur) {
+        if (!rememberMe) { sessionStorage.setItem('dmd_session', cur); localStorage.removeItem('dmd_session'); }
+      }
+    } catch (e) {}
   }
 
   function saveSession(j) {
     session = { access_token: j.access_token, refresh_token: j.refresh_token, user: j.user, expires_at: (j.expires_at || 0) * 1000 };
-    localStorage.setItem('dmd_session', JSON.stringify(session));
+    try {
+      if (!rememberMe) sessionStorage.setItem('dmd_session', JSON.stringify(session));
+      else localStorage.setItem('dmd_session', JSON.stringify(session));
+    } catch (e) {}
   }
 
   function loadSession() {
-    try { session = JSON.parse(localStorage.getItem('dmd_session')); } catch (e) { session = null; }
+    try {
+      const raw = localStorage.getItem('dmd_session') || sessionStorage.getItem('dmd_session');
+      session = raw ? JSON.parse(raw) : null;
+      rememberMe = !!localStorage.getItem('dmd_session');
+    } catch (e) { session = null; }
     return session;
   }
 
@@ -374,6 +623,7 @@ const Supa = (() => {
     } catch (e) { /* abaikan */ }
     session = null;
     localStorage.removeItem('dmd_session');
+    try { sessionStorage.removeItem('dmd_session'); } catch (e) {}
   }
 
   // ---------- REST (PostgREST) ----------
@@ -506,7 +756,7 @@ const Supa = (() => {
     if (!r.ok && r.status !== 404) throw new Error('Gagal menghapus file (' + r.status + ')');
   }
 
-  return { signUp, signIn, signOut, loadSession, refreshIfNearExpiry, getSession: () => session,
+  return { signUp, signIn, signOut, recover, setRemember, loadSession, refreshIfNearExpiry, getSession: () => session,
            songs, playlists, ptracks, upload, download, remove, objectUrl, publicUrl };
 })();
 
@@ -782,6 +1032,366 @@ const UI = (() => {
   return { toast, confirmDialog, fmtTime, fmtDate, esc, coverUrl, hydrateCoverImg, loadCover, songCard, songRow, playlistCard, skeletonGrid, empty };
 })();
 
+/* ==== auth.js ==== */
+/* ============================================================
+   auth.js — pengalaman autentikasi interaktif Dharma-Labs Digital.
+   Maskot "Dhiro" bereaksi pada STATE UI saja (fokus, loading,
+   sukses, gagal). Maskot TIDAK pernah membaca, merekam, atau
+   mengirim nilai kata sandi — hanya event fokus/ketikan.
+   Autentikasi nyata via Supabase (supa.js). Tanpa secret di frontend.
+   ============================================================ */
+const Auth = (() => {
+  const $ = (sel, root) => (root || document).querySelector(sel);
+  const $$ = (sel, root) => Array.from((root || document).querySelectorAll(sel));
+
+  // ---------- maskot (SVG inline, tanpa aset eksternal) ----------
+  function mascotSVG() {
+    return `
+    <svg viewBox="0 0 220 190" role="img" aria-label="Maskot Dhiro">
+      <defs>
+        <linearGradient id="mGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#2c313d"/><stop offset="1" stop-color="#1d2129"/>
+        </linearGradient>
+      </defs>
+      <g class="m-float">
+        <ellipse class="m-shadow" cx="110" cy="182" rx="48" ry="8"/>
+        <line class="m-antenna" x1="110" y1="20" x2="110" y2="40"/>
+        <circle class="m-antenna-tip" cx="110" cy="15" r="5"/>
+        <g class="m-arm m-arm-l"><rect x="26" y="84" width="27" height="52" rx="13.5"/></g>
+        <g class="m-arm m-arm-r"><rect x="167" y="84" width="27" height="52" rx="13.5"/></g>
+        <rect class="m-ear" x="26" y="88" width="14" height="30" rx="7"/>
+        <rect class="m-ear" x="180" y="88" width="14" height="30" rx="7"/>
+        <rect class="m-body" x="34" y="38" width="152" height="128" rx="36"/>
+        <rect class="m-face" x="52" y="58" width="116" height="86" rx="24"/>
+        <g class="m-eyes">
+          <g transform="translate(89,88)">
+            <ellipse class="m-eyeball" rx="10" ry="12.5"/>
+            <circle class="m-pupil" r="4.6"/>
+            <path class="m-happy" d="M-10,3 Q0,-9 10,3"/>
+          </g>
+          <g transform="translate(131,88)">
+            <ellipse class="m-eyeball" rx="10" ry="12.5"/>
+            <circle class="m-pupil" r="4.6"/>
+            <path class="m-happy" d="M-10,3 Q0,-9 10,3"/>
+          </g>
+        </g>
+        <g class="m-spins" transform="translate(110,88)">
+          <g class="m-spin-g"><circle class="sp1" r="17"/></g>
+          <g class="m-spin-g sp2g"><circle class="sp2" r="17"/></g>
+        </g>
+        <circle class="m-cheek" cx="68" cy="112" r="6"/>
+        <circle class="m-cheek" cx="152" cy="112" r="6"/>
+        <path class="m-mouth" d="M99,120 Q110,127 121,120"/>
+        <path class="m-mouth-smile" d="M94,115 Q110,133 126,115"/>
+        <path class="m-mouth-frown" d="M97,127 Q110,115 123,127"/>
+      </g>
+    </svg>`;
+  }
+
+  let moodTimer = null;
+  function mood(name, revertMs) {
+    const m = $('#mascot'); if (!m) return;
+    m.dataset.mood = name;
+    clearTimeout(moodTimer);
+    if (revertMs) moodTimer = setTimeout(() => { if (m.dataset.mood !== 'loading') m.dataset.mood = 'idle'; }, revertMs);
+  }
+  // arah pandang: hanya berdasarkan FIELD yang difokuskan, bukan isinya
+  function look(lx, ly) {
+    const m = $('#mascot'); if (!m) return;
+    m.style.setProperty('--lx', lx + 'px'); m.style.setProperty('--ly', ly + 'px');
+  }
+
+  // ---------- util ----------
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  // terjemahkan kegagalan jaringan (TypeError fetch) ke pesan ramah
+  function netErr(e) {
+    const m = (e && e.message) || '';
+    if (e instanceof TypeError || /fetch|network|load failed/i.test(m)) return 'Koneksi bermasalah. Periksa internet Anda, lalu coba lagi.';
+    return m || 'Terjadi kesalahan. Coba lagi.';
+  }
+  const strength = (pw) => {
+    let s = 0;
+    if (pw.length >= 6) s++;
+    if (pw.length >= 10) s++;
+    if (/[a-z]/.test(pw) && /[A-Z]/.test(pw) || (/[a-zA-Z]/.test(pw) && /\d/.test(pw) && pw.length >= 8)) s = Math.max(s, 2);
+    if (/[a-zA-Z]/.test(pw) && /\d/.test(pw) && /[^a-zA-Z0-9]/.test(pw) && pw.length >= 10) s = 4;
+    else if (/[a-z]/.test(pw) && /[A-Z]/.test(pw) && /\d/.test(pw)) s = 3;
+    return Math.min(s, 4);
+  };
+  const S_LABEL = ['Sangat lemah', 'Lemah', 'Cukup', 'Kuat', 'Sangat kuat'];
+
+  function fieldErr(input, msg) {
+    const box = input.closest('.authx-field');
+    box.querySelector('.authx-err-field').textContent = msg || '';
+    box.querySelector('.authx-input').classList.toggle('invalid', !!msg);
+    input.setAttribute('aria-invalid', msg ? 'true' : 'false');
+  }
+  function msg(el, text, type) {
+    el.className = 'authx-msg ' + (type || 'err') + (text ? ' show' : '');
+    el.textContent = text || '';
+  }
+  function busy(btn, on, label) {
+    btn.disabled = on;
+    if (on) { btn.dataset.old = btn.textContent; btn.innerHTML = '<span class="authx-spin" aria-hidden="true"></span>' + label; }
+    else if (btn.dataset.old !== undefined) { btn.textContent = btn.dataset.old; }
+  }
+
+  // ---------- render halaman ----------
+  function render(mode = 'in') {
+    const page = $('#page');
+    page.innerHTML = `
+      <div class="authx-wrap">
+        <div class="authx-stage"><div class="mascot" id="mascot" data-mood="idle">${mascotSVG()}</div></div>
+        <div class="authx-card">
+          <div class="authx-head">
+            <img src="${CONFIG.brand.logo}" alt="Logo Dharma-Labs Digital">
+            <h1>Dharma-Labs Digital</h1>
+            <p>Akses aman ke ekosistem musik Anda</p>
+          </div>
+          <div class="authx-tabs" role="tablist" aria-label="Pilih mode autentikasi">
+            <button role="tab" id="tabIn" aria-selected="${mode === 'in'}">Masuk</button>
+            <button role="tab" id="tabUp" aria-selected="${mode === 'up'}">Daftar</button>
+          </div>
+
+          <!-- PANEL MASUK -->
+          <form class="authx-panel ${mode === 'in' ? 'active' : ''}" id="panIn" novalidate>
+            <div class="authx-field">
+              <label for="inEmail">Email</label>
+              <div class="authx-input">
+                <input id="inEmail" type="email" autocomplete="email" inputmode="email" placeholder="nama@email.com">
+              </div>
+              <div class="authx-err-field" aria-live="polite"></div>
+            </div>
+            <div class="authx-field">
+              <label for="inPass">Kata sandi</label>
+              <div class="authx-input">
+                <input id="inPass" type="password" autocomplete="current-password" placeholder="Kata sandi Anda">
+                <button type="button" class="peek-btn" data-target="inPass" aria-label="Tampilkan kata sandi" aria-pressed="false">👁</button>
+              </div>
+              <div class="authx-err-field" aria-live="polite"></div>
+            </div>
+            <label class="authx-row check">
+              <input type="checkbox" id="inRemember" checked>
+              <span>Ingat sesi di perangkat ini</span>
+            </label>
+            <div class="authx-msg" id="inMsg" role="alert" aria-live="assertive"></div>
+            <button type="submit" class="authx-btn" id="inGo">Masuk</button>
+            <div class="authx-links">
+              <a id="toForgot">Lupa kata sandi?</a>
+            </div>
+          </form>
+
+          <!-- PANEL DAFTAR -->
+          <form class="authx-panel ${mode === 'up' ? 'active' : ''}" id="panUp" novalidate>
+            <div class="authx-field">
+              <label for="upName">Nama lengkap</label>
+              <div class="authx-input"><input id="upName" type="text" autocomplete="name" placeholder="Nama Anda"></div>
+              <div class="authx-err-field" aria-live="polite"></div>
+            </div>
+            <div class="authx-field">
+              <label for="upEmail">Email</label>
+              <div class="authx-input"><input id="upEmail" type="email" autocomplete="email" inputmode="email" placeholder="nama@email.com"></div>
+              <div class="authx-err-field" aria-live="polite"></div>
+            </div>
+            <div class="authx-field">
+              <label for="upPass">Kata sandi</label>
+              <div class="authx-input">
+                <input id="upPass" type="password" autocomplete="new-password" placeholder="Minimal 6 karakter">
+                <button type="button" class="peek-btn" data-target="upPass" aria-label="Tampilkan kata sandi" aria-pressed="false">👁</button>
+              </div>
+              <div class="authx-meter" id="upMeter" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+              <div class="authx-meter-label" id="upMeterLabel">Kekuatan kata sandi</div>
+              <div class="authx-err-field" aria-live="polite"></div>
+            </div>
+            <div class="authx-field">
+              <label for="upPass2">Ulangi kata sandi</label>
+              <div class="authx-input"><input id="upPass2" type="password" autocomplete="new-password" placeholder="Ketik ulang kata sandi"></div>
+              <div class="authx-err-field" aria-live="polite"></div>
+            </div>
+            <div class="authx-row">
+              <input type="checkbox" id="upTerms">
+              <span>Saya menyetujui <a id="lnkTerms">Syarat Penggunaan</a> dan <a id="lnkPrivacy">Kebijakan Privasi</a> Dharma-Labs.</span>
+            </div>
+            <div class="authx-msg" id="upMsg" role="alert" aria-live="assertive"></div>
+            <button type="submit" class="authx-btn" id="upGo">Buat Akun</button>
+          </form>
+
+          <!-- PANEL LUPA SANDI -->
+          <form class="authx-panel" id="panForgot" novalidate>
+            <p class="authx-hint" style="margin:0 0 14px;font-size:13px;color:#9aa0ab">
+              Masukkan email akun Anda. Kami akan mengirim tautan pemulihan kata sandi resmi.
+            </p>
+            <div class="authx-field">
+              <label for="fgEmail">Email terdaftar</label>
+              <div class="authx-input"><input id="fgEmail" type="email" autocomplete="email" inputmode="email" placeholder="nama@email.com"></div>
+              <div class="authx-err-field" aria-live="polite"></div>
+            </div>
+            <div class="authx-msg" id="fgMsg" role="alert" aria-live="assertive"></div>
+            <button type="submit" class="authx-btn" id="fgGo">Kirim Tautan Pemulihan</button>
+            <div class="authx-links"><a id="toLoginFromFg">Kembali ke halaman masuk</a></div>
+          </form>
+        </div>
+      </div>`;
+
+    wireTabs();
+    wireMascotTriggers();
+    wireLogin();
+    wireRegister();
+    wireForgot();
+  }
+
+  // ---------- tab & panel ----------
+  function showPanel(id, tab) {
+    $$('.authx-panel').forEach(p => p.classList.remove('active'));
+    $(id).classList.add('active');
+    $('#tabIn').setAttribute('aria-selected', tab === 'in');
+    $('#tabUp').setAttribute('aria-selected', tab === 'up');
+    mood('idle');
+  }
+  function wireTabs() {
+    $('#tabIn').onclick = () => showPanel('#panIn', 'in');
+    $('#tabUp').onclick = () => showPanel('#panUp', 'up');
+    $('#toForgot').onclick = () => { showPanel('#panForgot'); const e = $('#fgEmail'); if (e) e.focus(); };
+    $('#toLoginFromFg').onclick = () => showPanel('#panIn', 'in');
+    const terms = $('#lnkTerms'), priv = $('#lnkPrivacy');
+    if (terms) terms.onclick = () => UI.confirmDialog('Syarat Penggunaan Dharma-Labs',
+      '1. Gunakan layanan untuk karya musik yang sah milik Anda.<br>2. Jangan mengunggah konten ilegal atau melanggar hak cipta pihak lain.<br>3. Jaga kerahasiaan kata sandi akun Anda.<br>4. Kami dapat menonaktifkan akun yang melanggar ketentuan.', () => {});
+    if (priv) priv.onclick = () => UI.confirmDialog('Kebijakan Privasi Dharma-Labs',
+      '1. Data yang dikumpulkan: email, nama, dan berkas musik yang Anda unggah.<br>2. Data disimpan di infrastruktur Supabase dan hanya dapat dibaca oleh pemilik akun (RLS).<br>3. Kami tidak menjual atau membagikan data pribadi Anda.<br>4. Anda dapat meminta penghapusan akun dan data kapan saja.', () => {});
+  }
+
+  // ---------- maskot: pemicu hanya berbasis event UI ----------
+  function wireMascotTriggers() {
+    $$('.authx-input input').forEach(inp => {
+      const isSecret = inp.type === 'password';
+      inp.addEventListener('focus', () => {
+        if (isSecret) mood('covering'); else { mood('idle'); look(0, 4); }
+      });
+      inp.addEventListener('blur', () => { mood('idle'); look(0, 3); });
+      inp.addEventListener('input', () => { if (!isSecret) look(0, 4); }); // dengar ketikan, bukan isi
+    });
+    $$('.peek-btn').forEach(btn => {
+      btn.onclick = () => {
+        const inp = $('#' + btn.dataset.target);
+        const show = inp.type === 'password';
+        inp.type = show ? 'text' : 'password';
+        btn.setAttribute('aria-pressed', String(show));
+        btn.setAttribute('aria-label', show ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi');
+        if (document.activeElement === inp || inp.closest('.authx-panel').classList.contains('active'))
+          mood(show ? 'peek' : (inp.value ? 'covering' : 'idle')); // saat terlihat: pura-pura tak melihat
+      };
+    });
+  }
+
+  // ---------- MASUK ----------
+  function wireLogin() {
+    const form = $('#panIn'), email = $('#inEmail'), pass = $('#inPass'), m = $('#inMsg');
+    email.addEventListener('input', () => fieldErr(email, !email.value || EMAIL_RE.test(email.value.trim()) ? '' : 'Format email tidak valid.'));
+    const validate = () => {
+      let ok = true;
+      if (!email.value.trim()) { fieldErr(email, 'Email wajib diisi.'); ok = false; }
+      else if (!EMAIL_RE.test(email.value.trim())) { fieldErr(email, 'Format email tidak valid.'); ok = false; }
+      else fieldErr(email, '');
+      if (!pass.value) { fieldErr(pass, 'Kata sandi wajib diisi.'); ok = false; }
+      else if (pass.value.length < 6) { fieldErr(pass, 'Kata sandi minimal 6 karakter.'); ok = false; }
+      else fieldErr(pass, '');
+      return ok;
+    };
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      msg(m, '');
+      if (!validate()) { mood('fail', 1800); msg(m, 'Periksa kembali isian Anda.'); return; }
+      const btn = $('#inGo');
+      busy(btn, true, 'Memproses…'); mood('loading');
+      try {
+        Supa.setRemember($('#inRemember').checked);
+        await Supa.signIn(email.value.trim(), pass.value);
+        mood('success', 2200);
+        btn.classList.add('ok'); btn.textContent = 'Berhasil ✓';
+        setTimeout(() => { location.hash = '#/'; }, 700);
+      } catch (err) {
+        busy(btn, false);
+        pass.value = ''; pass.focus(); // fokus dulu agar mood gagal tidak tertutup 'covering'
+        mood('fail', 2200);
+        btn.classList.add('fail');
+        setTimeout(() => btn.classList.remove('fail'), 1600);
+        msg(m, netErr(err));
+      }
+    });
+  }
+
+  // ---------- DAFTAR ----------
+  function wireRegister() {
+    const form = $('#panUp'), name = $('#upName'), email = $('#upEmail'),
+      pass = $('#upPass'), pass2 = $('#upPass2'), m = $('#upMsg');
+    const meterBars = $$('#upMeter i'), label = $('#upMeterLabel');
+    pass.addEventListener('input', () => {
+      const s = pass.value ? strength(pass.value) : 0;
+      meterBars.forEach((b, i) => { b.className = i < s ? 'on-' + s : ''; });
+      label.textContent = pass.value ? 'Kekuatan: ' + S_LABEL[s] : 'Kekuatan kata sandi';
+      if (pass2.value) fieldErr(pass2, pass2.value === pass.value ? '' : 'Konfirmasi belum cocok.');
+    });
+    pass2.addEventListener('input', () => fieldErr(pass2, pass2.value === pass.value ? '' : 'Konfirmasi belum cocok.'));
+    email.addEventListener('input', () => fieldErr(email, !email.value || EMAIL_RE.test(email.value.trim()) ? '' : 'Format email tidak valid.'));
+    const validate = () => {
+      let ok = true;
+      if (name.value.trim().length < 2) { fieldErr(name, 'Nama minimal 2 karakter.'); ok = false; } else fieldErr(name, '');
+      if (!EMAIL_RE.test(email.value.trim())) { fieldErr(email, 'Masukkan email yang valid.'); ok = false; } else fieldErr(email, '');
+      if (pass.value.length < 6) { fieldErr(pass, 'Kata sandi minimal 6 karakter.'); ok = false; } else fieldErr(pass, '');
+      if (pass2.value !== pass.value || !pass2.value) { fieldErr(pass2, 'Konfirmasi kata sandi tidak cocok.'); ok = false; } else fieldErr(pass2, '');
+      if (!$('#upTerms').checked) { ok = false; msg(m, 'Anda harus menyetujui syarat penggunaan dan kebijakan privasi.'); }
+      else msg(m, '');
+      return ok;
+    };
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!validate()) { mood('fail', 1800); if (!m.textContent) msg(m, 'Periksa kembali isian Anda.'); return; }
+      const btn = $('#upGo');
+      busy(btn, true, 'Membuat akun…'); mood('loading');
+      try {
+        const j = await Supa.signUp(email.value.trim(), pass.value, name.value.trim());
+        busy(btn, false);
+        if (j && j.user && !j.access_token) {
+          mood('idle');
+          msg(m, 'Pendaftaran berhasil! Silakan verifikasi email Anda, lalu masuk.', 'ok');
+          setTimeout(() => showPanel('#panIn', 'in'), 2200);
+        } else {
+          mood('success', 2200);
+          btn.classList.add('ok'); btn.textContent = 'Akun Dibuat ✓';
+          setTimeout(() => { location.hash = '#/'; }, 800);
+        }
+      } catch (err) {
+        busy(btn, false); mood('fail', 2200);
+        msg(m, netErr(err) === 'Terjadi kesalahan. Coba lagi.' ? 'Pendaftaran gagal. Coba lagi.' : netErr(err));
+      }
+    });
+  }
+
+  // ---------- LUPA SANDI (alur resmi Supabase) ----------
+  function wireForgot() {
+    const form = $('#panForgot'), email = $('#fgEmail'), m = $('#fgMsg');
+    email.addEventListener('input', () => fieldErr(email, !email.value || EMAIL_RE.test(email.value.trim()) ? '' : 'Format email tidak valid.'));
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      msg(m, '');
+      if (!EMAIL_RE.test(email.value.trim())) { fieldErr(email, 'Masukkan email yang valid.'); mood('fail', 1600); return; }
+      fieldErr(email, '');
+      const btn = $('#fgGo');
+      busy(btn, true, 'Mengirim…'); mood('loading');
+      try {
+        await Supa.recover(email.value.trim());
+        busy(btn, false); mood('success', 2400);
+        msg(m, 'Jika email terdaftar, tautan pemulihan telah dikirim. Periksa kotak masuk (dan folder spam) Anda.', 'ok');
+      } catch (err) {
+        busy(btn, false); mood('fail', 2200);
+        msg(m, 'Tidak dapat mengirim tautan pemulihan saat ini. Coba lagi beberapa saat.');
+      }
+    });
+  }
+
+  return { render };
+})();
+
 /* ==== pages.js ==== */
 /* ============================================================
    pages.js — seluruh halaman: beranda, koleksi, playlist,
@@ -795,43 +1405,9 @@ const Pages = (() => {
     return true;
   }
 
-  // ---------------- HALAMAN LOGIN ----------------
+  // ---------------- HALAMAN LOGIN (pengalaman interaktif) ----------------
   function login(mode = 'in') {
-    const page = $('#page');
-    page.innerHTML = `
-      <div class="auth-wrap"><div class="auth-card">
-        <img src="${CONFIG.brand.logo}" alt="Dharma Labs Digital">
-        <h1>${CONFIG.brand.name}</h1>
-        <div class="sub">${mode === 'in' ? 'Masuk ke perpustakaan musik Anda' : 'Buat akun pemilik pertama'}</div>
-        <div class="field"><label>Email</label><input id="authEmail" type="email" autocomplete="email" placeholder="email@contoh.com"></div>
-        <div class="field"><label>Kata sandi</label><input id="authPass" type="password" autocomplete="current-password" placeholder="Minimal 6 karakter"></div>
-        <div class="err hidden" id="authErr"></div>
-        <button class="btn btn-primary" id="authGo" style="width:100%;margin-top:6px">${mode === 'in' ? 'Masuk' : 'Daftar'}</button>
-        <div class="toggle" id="authToggle">${mode === 'in' ? 'Belum punya akun? Daftar di sini' : 'Sudah punya akun? Masuk di sini'}</div>
-      </div></div>`;
-    const go = async () => {
-      const email = $('#authEmail').value.trim(), pass = $('#authPass').value;
-      const err = $('#authErr');
-      err.classList.add('hidden');
-      if (!email || !pass) { err.textContent = 'Email dan kata sandi wajib diisi.'; err.classList.remove('hidden'); return; }
-      if (mode === 'up' && pass.length < 6) { err.textContent = 'Kata sandi minimal 6 karakter.'; err.classList.remove('hidden'); return; }
-      $('#authGo').disabled = true; $('#authGo').textContent = 'Memproses...';
-      try {
-        if (mode === 'in') await Supa.signIn(email, pass);
-        else {
-          const j = await Supa.signUp(email, pass);
-          if (!j.access_token) { err.textContent = 'Pendaftaran berhasil. Silakan verifikasi email lalu masuk.'; err.classList.remove('hidden'); $('#authGo').disabled = false; $('#authGo').textContent = 'Daftar'; return; }
-        }
-        UI.toast(mode === 'in' ? 'Selamat datang kembali.' : 'Akun berhasil dibuat.', 'ok');
-        App.boot();
-      } catch (e) {
-        err.textContent = e.message; err.classList.remove('hidden');
-        $('#authGo').disabled = false; $('#authGo').textContent = mode === 'in' ? 'Masuk' : 'Daftar';
-      }
-    };
-    $('#authGo').onclick = go;
-    $('#authPass').addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
-    $('#authToggle').onclick = () => login(mode === 'in' ? 'up' : 'in');
+    Auth.render(mode);
   }
 
   // ---------------- BERANDA ----------------
@@ -1285,7 +1861,8 @@ const Pages = (() => {
 const App = (() => {
   const routes = {
     '/': Pages.home, '/koleksi': Pages.koleksi, '/playlist': Pages.playlistIndex,
-    '/manajemen': Pages.manajemen, '/upload': Pages.upload, '/login': () => Pages.login('in')
+    '/manajemen': Pages.manajemen, '/upload': Pages.upload, '/login': () => Pages.login('in'),
+    '/daftar': () => Pages.login('up')
   };
 
   function parseHash() {
@@ -1307,10 +1884,10 @@ const App = (() => {
     if (Supa.getSession()) {
       document.getElementById('navbar').classList.remove('hidden');
       setActiveNav('/' + r.page.split('/')[1]);
-      if (r.page === '/login') { location.hash = '#/'; return; } // sudah masuk: langsung ke beranda
+      if (r.page === '/login' || r.page === '/daftar') { location.hash = '#/'; return; } // sudah masuk: langsung ke beranda
     } else {
       document.getElementById('navbar').classList.add('hidden');
-      if (r.page !== '/login') { location.hash = '#/login'; return; }
+      if (r.page !== '/login' && r.page !== '/daftar') { location.hash = '#/login'; return; }
     }
     if (r.page === 'playlistDetail') Pages.playlistDetail(r.id);
     else if (routes[r.page]) routes[r.page]();
