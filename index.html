@@ -613,7 +613,16 @@ const Supa = (() => {
         method: 'POST', headers: headers(false, { 'Content-Type': 'application/json' }),
         body: JSON.stringify({ refresh_token: session.refresh_token })
       });
-      if (r.ok) saveSession(await r.json());
+      if (r.ok) { saveSession(await r.json()); }
+      else if (r.status === 400 || r.status === 401) {
+        // refresh token tidak valid/kedaluwarsa: akhiri sesi dengan bersih
+        session = null;
+        try {
+          localStorage.removeItem('dmd_session');
+          sessionStorage.removeItem('dmd_session');
+        } catch (e) {}
+        if (location.hash !== '#/login' && location.hash !== '#/daftar') location.hash = '#/login';
+      }
     } catch (e) { /* offline: lanjut dengan token lama */ }
   }
 
